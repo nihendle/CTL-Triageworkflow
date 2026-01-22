@@ -1,0 +1,3362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCR Triage System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header p {
+            margin-top: 8px;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        /* View Toggle Styles */
+        .view-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: white;
+            padding: 6px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            width: fit-content;
+        }
+
+        .view-toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-toggle-btn:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .view-toggle-btn.active {
+            background: #0078d4;
+            color: white;
+        }
+
+        .view-toggle-btn.active.pg-active {
+            background: #7c3aed;
+        }
+
+        .view-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-toggle-btn:not(.active) .view-badge {
+            background: #f59e0b;
+            color: white;
+        }
+
+        /* PG Triage View Styles */
+        .pg-triage-view {
+            display: none;
+        }
+
+        .pg-triage-view.active {
+            display: block;
+        }
+
+        .badge.pg-badge {
+            background: #7c3aed;
+        }
+
+        .pg-submission-info {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .pg-submission-info p {
+            margin: 0 0 8px 0;
+            color: #4b5563;
+        }
+
+        .pg-submission-info p:last-child {
+            margin-bottom: 0;
+        }
+
+        .roadmap-alignment {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .roadmap-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #f9fafb;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .roadmap-item.aligned {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .roadmap-item.partial {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .roadmap-item.not-aligned {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .engineering-estimate {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .estimate-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: #f9fafb;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .estimate-label {
+            color: #6b7280;
+        }
+
+        .estimate-value {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .pg-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .pg-status-badge.pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .pg-status-badge.approved {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .pg-status-badge.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .pg-status-badge.backlog {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .nav-breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .nav-breadcrumb a {
+            color: #0078d4;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .nav-breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .nav-breadcrumb span {
+            color: #6b7280;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header .badge {
+            background: #0078d4;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .card-header .badge.pending {
+            background: #f59e0b;
+        }
+
+        .card-body {
+            padding: 0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.05em;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        tr.clickable {
+            cursor: pointer;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .dcr-id {
+            color: #0078d4;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .dcr-id:hover {
+            text-decoration: underline;
+        }
+
+        .requester-link {
+            color: #0078d4;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .requester-link:hover {
+            text-decoration: underline;
+            color: #005a9e;
+        }
+
+        .description-cell {
+            max-width: 250px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .priority {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .priority.critical {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority.high {
+            background: #ffedd5;
+            color: #ea580c;
+        }
+
+        .priority.medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .priority.low {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .fr-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .fr-badge.yes {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .fr-badge.no {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        .source-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            background: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: #0078d4;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #005a9e;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #d1d5db;
+        }
+
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .submitted-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #059669;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .submitted-indicator svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6b7280;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #1f2937;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+        }
+
+        .form-group select:disabled {
+            background: #f3f4f6;
+            cursor: not-allowed;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .step {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+
+        .step.active {
+            background: #0078d4;
+            color: white;
+        }
+
+        .step.completed {
+            background: #059669;
+            color: white;
+        }
+
+        .step-line {
+            width: 60px;
+            height: 2px;
+            background: #e5e7eb;
+        }
+
+        .step-line.completed {
+            background: #059669;
+        }
+
+        .detail-view {
+            display: none;
+        }
+
+        .detail-view.active {
+            display: block;
+        }
+
+        .main-view {
+            display: block;
+        }
+
+        .main-view.hidden {
+            display: none;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            padding: 24px;
+        }
+
+        .detail-section {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .detail-section h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .detail-section p {
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .detail-section.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .detail-actions {
+            padding: 24px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .decision-picker {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .decision-btn {
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .decision-btn:hover {
+            border-color: #0078d4;
+            background: #f0f9ff;
+        }
+
+        .decision-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .status-message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-top: 16px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-message.success {
+            display: flex;
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-message svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .pending-section {
+            margin-top: 24px;
+        }
+
+        .empty-state {
+            padding: 48px;
+            text-align: center;
+            color: #6b7280;
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 12px;
+            }
+
+            th, td {
+                padding: 8px 12px;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            transition: border-color 0.2s;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            background: white;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: #0078d4;
+            box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+        }
+
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .search-select-container {
+            position: relative;
+        }
+
+        .search-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-dropdown.active {
+            display: block;
+        }
+
+        .search-dropdown-item {
+            padding: 10px 14px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f4f6;
+            transition: background 0.15s;
+        }
+
+        .search-dropdown-item:hover {
+            background: #f0f9ff;
+        }
+
+        .search-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-dropdown-item .item-title {
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .search-dropdown-item .item-meta {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 2px;
+        }
+
+        .search-dropdown-empty {
+            padding: 16px;
+            text-align: center;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .selected-feature-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .remove-feature-btn {
+            background: none;
+            border: none;
+            color: #1e40af;
+            font-size: 18px;
+            cursor: pointer;
+            line-height: 1;
+            padding: 0;
+            margin-left: 4px;
+        }
+
+        .remove-feature-btn:hover {
+            color: #1e3a8a;
+        }
+
+        .divider-with-text {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+
+        .divider-with-text::before,
+        .divider-with-text::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #e5e7eb;
+        }
+
+        .divider-with-text span {
+            padding: 0 16px;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .full-width {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .new-feature-form {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+
+        .new-feature-form h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #374151;
+        }
+
+        .triage-outcome-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .triage-outcome-badge.available {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .triage-outcome-badge.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .triage-outcome-badge.evidence {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        /* Detail Layout with Side Pane */
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 360px;
+            gap: 24px;
+        }
+
+        .detail-main {
+            min-width: 0;
+        }
+
+        /* Copilot Side Pane */
+        .copilot-pane {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+
+        .copilot-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+            border-radius: 12px 12px 0 0;
+        }
+
+        .copilot-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 15px;
+            color: #1f2937;
+        }
+
+        .copilot-badge {
+            background: linear-gradient(135deg, #0078D4 0%, #7B83EB 50%, #9F7BE1 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .copilot-content {
+            padding: 16px;
+        }
+
+        .copilot-section {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .copilot-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .copilot-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .copilot-section-header svg {
+            color: #6b7280;
+        }
+
+        .copilot-section-header h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin: 0;
+        }
+
+        .copilot-metric {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0078d4;
+        }
+
+        .metric-label {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .copilot-customers {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .customer-tag {
+            background: #f3f4f6;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .copilot-summary {
+            font-size: 13px;
+            color: #4b5563;
+            line-height: 1.6;
+            margin: 0;
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #0078d4;
+        }
+
+        .copilot-features {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .feature-match {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 10px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .feature-match:hover {
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+
+        .feature-match-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: #166534;
+            margin-bottom: 4px;
+        }
+
+        .feature-match-meta {
+            font-size: 11px;
+            color: #6b7280;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .match-score {
+            color: #059669;
+            font-weight: 500;
+        }
+
+        .duplication-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .duplication-bar {
+            flex: 1;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .duplication-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            background: linear-gradient(90deg, #22c55e 0%, #eab308 50%, #ef4444 100%);
+        }
+
+        .duplication-score {
+            font-size: 16px;
+            font-weight: 700;
+            color: #374151;
+            min-width: 45px;
+        }
+
+        .copilot-hint {
+            font-size: 12px;
+            color: #6b7280;
+            margin: 0;
+            font-style: italic;
+        }
+
+        /* Duplication Score Badge in Table */
+        .duplication-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .duplication-badge.low {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .duplication-badge.medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .duplication-badge.high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Recommended Features in Modal */
+        .modal-wide {
+            max-width: 600px;
+        }
+
+        .recommended-features-section {
+            margin-bottom: 16px;
+        }
+
+        .copilot-recommendation-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .recommended-features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .recommended-feature-item {
+            background: #f8faff;
+            border: 2px solid #e0e7ff;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .recommended-feature-item:hover {
+            background: #eef2ff;
+            border-color: #c7d2fe;
+        }
+
+        .recommended-feature-item.selected {
+            background: #dbeafe;
+            border-color: #0078d4;
+        }
+
+        .recommended-feature-item .feature-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .recommended-feature-item .feature-meta {
+            font-size: 12px;
+            color: #6b7280;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recommended-feature-item .match-percentage {
+            background: linear-gradient(135deg, #0078D4 0%, #7B83EB 100%);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        /* Message Requester Modal Styles */
+        .message-recipient-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .recipient-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .recipient-details {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .recipient-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 15px;
+        }
+
+        .recipient-dcr {
+            font-size: 13px;
+            color: #6b7280;
+        }
+
+        .message-templates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .template-btn {
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            background: white;
+            font-size: 12px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-btn:hover {
+            background: #f0f9ff;
+            border-color: #0078d4;
+            color: #0078d4;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #374151;
+            cursor: pointer;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1200px) {
+            .detail-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .copilot-pane {
+                position: relative;
+                top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <h1>
+                <div class="header-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                </div>
+                Feature Request &amp; DCR Triage System
+            </h1>
+            <p>Manage and triage Design Change Requests across Microsoft Security products</p>
+        </div>
+
+        <div class="view-toggle">
+            <button class="view-toggle-btn active" id="cxeToggleBtn" onclick="switchView('cxe')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                CxE Triage
+            </button>
+            <button class="view-toggle-btn" id="pgToggleBtn" onclick="switchView('pg')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                    <path d="M2 17l10 5 10-5"></path>
+                    <path d="M2 12l10 5 10-5"></path>
+                </svg>
+                PG Triage
+                <span class="view-badge" id="pgBadgeCount">0</span>
+            </button>
+        </div>
+
+        <div id="mainView" class="main-view">
+            <div class="card animate-in">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="3" y1="9" x2="21" y2="9"></line>
+                            <line x1="9" y1="21" x2="9" y2="9"></line>
+                        </svg>
+                        DCR Triage Queue
+                        <span class="badge" id="queueCount">0</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>DCR ID</th>
+                                    <th>Product Name</th>
+                                    <th>Created Date</th>
+                                    <th>Requester</th>
+                                    <th>Customer Name</th>
+                                    <th>Description</th>
+                                    <th>Priority</th>
+                                    <th>Duplication Score</th>
+                                    <th>FR Exists</th>
+                                    <th>Source</th>
+                                    <th>Submit to PG</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dcrTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card pending-section animate-in">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                        Pending PG Response
+                        <span class="badge pending" id="pendingCount">0</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div id="pendingTableContainer">
+                        <div class="empty-state" id="pendingEmptyState">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <p>No DCRs pending PG response</p>
+                        </div>
+                        <div class="table-container" id="pendingTable" style="display: none;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>DCR ID</th>
+                                        <th>Product Name</th>
+                                        <th>Product Group</th>
+                                        <th>Feature Area</th>
+                                        <th>Submitted Date</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pendingTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PG Triage View -->
+        <div id="pgTriageView" class="pg-triage-view">
+            <div class="card animate-in">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                            <path d="M2 17l10 5 10-5"></path>
+                            <path d="M2 12l10 5 10-5"></path>
+                        </svg>
+                        PG Triage Queue
+                        <span class="badge pg-badge" id="pgQueueCount">0</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div id="pgEmptyState" class="empty-state" style="display: none;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        <p>No DCRs submitted to Product Group yet</p>
+                        <p style="font-size: 13px; margin-top: 8px;">DCRs will appear here after CxE submits them for PG review</p>
+                    </div>
+                    <div class="table-container" id="pgTableContainer">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>DCR ID</th>
+                                    <th>Product Name</th>
+                                    <th>Feature Area</th>
+                                    <th>Submitted Date</th>
+                                    <th>Requester</th>
+                                    <th>Customer Name</th>
+                                    <th>Description</th>
+                                    <th>Priority</th>
+                                    <th>Source</th>
+                                    <th>PG Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pgTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PG Detail View -->
+        <div id="pgDetailView" class="detail-view">
+            <nav class="nav-breadcrumb">
+                <a onclick="showPgMainView()">&#8592; Back to PG Queue</a>
+                <span>/</span>
+                <span id="pgDetailBreadcrumb">DCR-0000</span>
+            </nav>
+
+            <div class="detail-layout">
+            <div class="detail-main">
+            <div class="card animate-in">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <span id="pgDetailTitle">DCR Details</span>
+                    </h2>
+                    <span class="priority" id="pgDetailPriority">Medium</span>
+                </div>
+                <div class="card-body">
+                    <div class="detail-grid">
+                        <div class="detail-section">
+                            <h4>DCR ID</h4>
+                            <p id="pgDetailId">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Product</h4>
+                            <p id="pgDetailProduct">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Feature Area</h4>
+                            <p id="pgDetailFeatureArea">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Source</h4>
+                            <p id="pgDetailSource">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Priority</h4>
+                            <p id="pgDetailPriorityText">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Requester</h4>
+                            <p id="pgDetailRequester">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Customer</h4>
+                            <p id="pgDetailCustomer">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Submitted Date</h4>
+                            <p id="pgDetailSubmittedDate">-</p>
+                        </div>
+                        <div class="detail-section full-width">
+                            <h4>Use Case</h4>
+                            <p id="pgDetailUseCase">-</p>
+                        </div>
+                        <div class="detail-section full-width">
+                            <h4>Customer Impact</h4>
+                            <p id="pgDetailCustomerImpact">-</p>
+                        </div>
+                        <div class="detail-section full-width">
+                            <h4>Description</h4>
+                            <p id="pgDetailDescription">-</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-actions">
+                        <h4 style="width: 100%; margin-bottom: 12px; font-size: 14px; color: #374151;">PG Triage Decision</h4>
+                        <div class="decision-picker">
+                            <button class="decision-btn" onclick="openPgRejectedModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                                Rejected
+                            </button>
+                            <button class="decision-btn" onclick="openPgApprovedModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                Approved
+                            </button>
+                            <button class="decision-btn" onclick="openPgBacklogModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="8" y1="12" x2="16" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12" y2="16"></line>
+                                </svg>
+                                Add to Backlog
+                            </button>
+                            <button class="decision-btn" onclick="openPgMoreInfoModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                                Need More Info
+                            </button>
+                        </div>
+                        <div class="status-message" id="pgDetailStatusMessage">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span id="pgDetailStatusText"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- PG Copilot Side Pane -->
+            <div class="copilot-pane">
+                <div class="copilot-header">
+                    <div class="copilot-logo">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="copilotGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#7c3aed"/>
+                                    <stop offset="50%" style="stop-color:#a855f7"/>
+                                    <stop offset="100%" style="stop-color:#c084fc"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="url(#copilotGradient3)"/>
+                        </svg>
+                        <span>PG Triage Copilot</span>
+                    </div>
+                    <span class="copilot-badge" style="background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);">AI Insights</span>
+                </div>
+                <div class="copilot-content">
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            <h4>CxE Submission Notes</h4>
+                        </div>
+                        <div class="pg-submission-info" id="pgSubmissionInfo">
+                            <p><strong>Product Group:</strong> <span id="pgInfoProductGroup">-</span></p>
+                            <p><strong>Feature Area:</strong> <span id="pgInfoFeatureArea">-</span></p>
+                            <p><strong>Submitted:</strong> <span id="pgInfoSubmittedDate">-</span></p>
+                        </div>
+                    </div>
+
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            <h4>Request Volume</h4>
+                        </div>
+                        <div class="copilot-metric">
+                            <span class="metric-value" id="pgSimilarRequestCount">3</span>
+                            <span class="metric-label">similar requests received</span>
+                        </div>
+                        <div class="copilot-customers" id="pgSimilarCustomers">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            <h4>Roadmap Alignment</h4>
+                        </div>
+                        <div class="roadmap-alignment" id="roadmapAlignment">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="18" y1="20" x2="18" y2="10"></line>
+                                <line x1="12" y1="20" x2="12" y2="4"></line>
+                                <line x1="6" y1="20" x2="6" y2="14"></line>
+                            </svg>
+                            <h4>Engineering Estimate</h4>
+                        </div>
+                        <div class="engineering-estimate" id="engineeringEstimate">
+                            <div class="estimate-item">
+                                <span class="estimate-label">Complexity:</span>
+                                <span class="estimate-value" id="estimateComplexity">Medium</span>
+                            </div>
+                            <div class="estimate-item">
+                                <span class="estimate-label">Effort:</span>
+                                <span class="estimate-value" id="estimateEffort">2-3 sprints</span>
+                            </div>
+                            <div class="estimate-item">
+                                <span class="estimate-label">Dependencies:</span>
+                                <span class="estimate-value" id="estimateDependencies">Low</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+
+        <!-- PG Rejected Modal -->
+        <div class="modal-overlay" id="pgRejectedModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Reject DCR</h3>
+                    <button class="modal-close" onclick="closePgRejectedModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="pgRejectionReason">Rejection Reason</label>
+                        <select id="pgRejectionReason">
+                            <option value="">-- Select Reason --</option>
+                            <option value="Out of Scope">Out of Scope</option>
+                            <option value="Technical Limitations">Technical Limitations</option>
+                            <option value="Resource Constraints">Resource Constraints</option>
+                            <option value="Duplicate Request">Duplicate Request</option>
+                            <option value="Not Aligned with Roadmap">Not Aligned with Roadmap</option>
+                            <option value="Insufficient Business Case">Insufficient Business Case</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="pgRejectionNotes">Rejection Notes</label>
+                        <textarea id="pgRejectionNotes" class="form-textarea" placeholder="Please provide detailed explanation for rejecting this DCR..." rows="6"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closePgRejectedModal()">Cancel</button>
+                    <button class="btn btn-danger" onclick="submitPgRejected()">Reject DCR</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="detailView" class="detail-view">
+            <nav class="nav-breadcrumb">
+                <a onclick="showMainView()">&#8592; Back to Queue</a>
+                <span>/</span>
+                <span id="detailBreadcrumb">DCR-0000</span>
+            </nav>
+
+            <div class="detail-layout">
+            <div class="detail-main">
+            <div class="card animate-in">
+                <div class="card-header">
+                    <h2>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <span id="detailTitle">DCR Details</span>
+                    </h2>
+                    <span class="priority" id="detailPriority">Medium</span>
+                </div>
+                <div class="card-body">
+                    <div class="detail-grid">
+                        <div class="detail-section">
+                            <h4>DCR ID</h4>
+                            <p id="detailId">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Product</h4>
+                            <p id="detailProduct">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Product Area</h4>
+                            <p id="detailProductArea">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Source</h4>
+                            <p id="detailSource">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Priority</h4>
+                            <p id="detailPriorityText">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Requester</h4>
+                            <p id="detailRequester">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Customer</h4>
+                            <p id="detailCustomer">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Created Date</h4>
+                            <p id="detailCreatedDate">-</p>
+                        </div>
+                        <div class="detail-section full-width">
+                            <h4>Use Case</h4>
+                            <p id="detailUseCase">-</p>
+                        </div>
+                        <div class="detail-section full-width">
+                            <h4>Customer Impact</h4>
+                            <p id="detailCustomerImpact">-</p>
+                        </div>
+                        <div class="detail-section full-width">
+                            <h4>Description</h4>
+                            <p id="detailDescription">-</p>
+                        </div>
+                    </div>
+
+                    <div class="detail-actions">
+                        <h4 style="width: 100%; margin-bottom: 12px; font-size: 14px; color: #374151;">Triage Outcome</h4>
+                        <div class="decision-picker">
+                            <button class="decision-btn" id="submitToPGBtn" onclick="openSubmitModal(currentDcr)">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                                Submit to PG
+                            </button>
+                            <button class="decision-btn" id="revertSubmissionBtn" onclick="revertSubmission()" style="display: none;">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="1 4 1 10 7 10"></polyline>
+                                    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
+                                </svg>
+                                Revert PG Submission
+                            </button>
+                            <button class="decision-btn" onclick="openFeatureAvailableModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                Feature Already Available
+                            </button>
+                            <button class="decision-btn" onclick="openRejectedModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                                Rejected
+                            </button>
+                            <button class="decision-btn" onclick="openEvidenceGatheringModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="12" y1="18" x2="12" y2="12"></line>
+                                    <line x1="9" y1="15" x2="15" y2="15"></line>
+                                </svg>
+                                Evidence Gathering
+                            </button>
+                        </div>
+                        <div class="status-message" id="detailStatusMessage">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                            <span id="detailStatusText"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+
+            <!-- Triage CoPilot Side Pane -->
+            <div class="copilot-pane">
+                <div class="copilot-header">
+                    <div class="copilot-logo">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="copilotGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#0078D4"/>
+                                    <stop offset="50%" style="stop-color:#7B83EB"/>
+                                    <stop offset="100%" style="stop-color:#9F7BE1"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="url(#copilotGradient)"/>
+                        </svg>
+                        <span>Triage Copilot</span>
+                    </div>
+                    <span class="copilot-badge">AI Insights</span>
+                </div>
+                <div class="copilot-content">
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            <h4>Similar Requests</h4>
+                        </div>
+                        <div class="copilot-metric">
+                            <span class="metric-value" id="similarRequestCount">3</span>
+                            <span class="metric-label">customers requested similar features</span>
+                        </div>
+                        <div class="copilot-customers" id="similarCustomers">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="21" y1="10" x2="3" y2="10"></line>
+                                <line x1="21" y1="6" x2="3" y2="6"></line>
+                                <line x1="21" y1="14" x2="3" y2="14"></line>
+                                <line x1="21" y1="18" x2="3" y2="18"></line>
+                            </svg>
+                            <h4>AI Summary</h4>
+                        </div>
+                        <p class="copilot-summary" id="aiSummary">
+                            <!-- Populated dynamically -->
+                        </p>
+                    </div>
+
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            <h4>Potential Matching Features</h4>
+                        </div>
+                        <div class="copilot-features" id="potentialFeatures">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 16v-4"></path>
+                                <path d="M12 8h.01"></path>
+                            </svg>
+                            <h4>Duplication Analysis</h4>
+                        </div>
+                        <div class="duplication-indicator">
+                            <div class="duplication-bar">
+                                <div class="duplication-fill" id="duplicationFill"></div>
+                            </div>
+                            <span class="duplication-score" id="duplicationScoreDetail">0%</span>
+                        </div>
+                        <p class="copilot-hint" id="duplicationHint">Low likelihood of duplicate request</p>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="submitModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Submit to Product Group</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="step-indicator">
+                    <div class="step active" id="step1">1</div>
+                    <div class="step-line" id="stepLine"></div>
+                    <div class="step" id="step2">2</div>
+                </div>
+
+                <div id="modalStep1">
+                    <div class="form-group">
+                        <label for="productGroupSelect">Select Product Group</label>
+                        <select id="productGroupSelect" onchange="onProductGroupChange()">
+                            <option value="">-- Select Product Group --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="modalStep2" style="display: none;">
+                    <div class="form-group">
+                        <label>Selected Product Group</label>
+                        <p id="selectedProductGroup" style="font-weight: 600; color: #0078d4;"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="featureAreaSelect">Select Feature Area</label>
+                        <select id="featureAreaSelect">
+                            <option value="">-- Select Feature Area --</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-secondary" id="backBtn" onclick="goBack()" style="display: none;">Back</button>
+                <button class="btn btn-primary" id="nextBtn" onclick="goNext()" disabled>Next</button>
+                <button class="btn btn-success" id="submitBtn" onclick="submitToPG()" style="display: none;">Submit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Already Available Modal -->
+    <div class="modal-overlay" id="featureAvailableModal">
+        <div class="modal modal-wide">
+            <div class="modal-header">
+                <h3>Feature Already Available</h3>
+                <button class="modal-close" onclick="closeFeatureAvailableModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="recommendedFeaturesSection" class="recommended-features-section">
+                    <div class="copilot-recommendation-header">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="copilotGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#0078D4"/>
+                                    <stop offset="50%" style="stop-color:#7B83EB"/>
+                                    <stop offset="100%" style="stop-color:#9F7BE1"/>
+                                </linearGradient>
+                            </defs>
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" fill="url(#copilotGradient2)"/>
+                        </svg>
+                        <span>Copilot Recommended Features</span>
+                    </div>
+                    <div class="recommended-features-list" id="recommendedFeaturesList">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+                <div class="divider-with-text">
+                    <span>OR SELECT MANUALLY</span>
+                </div>
+                <div class="form-group">
+                    <label for="availabilityStatus">Availability Status</label>
+                    <select id="availabilityStatus">
+                        <option value="">-- Select Availability Status --</option>
+                        <option value="Generally Available">Generally Available</option>
+                        <option value="Public Preview">Public Preview</option>
+                        <option value="Private Preview">Private Preview</option>
+                        <option value="Island Preview">Island Preview</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="availabilityNotes">Additional Information</label>
+                    <textarea id="availabilityNotes" class="form-textarea" placeholder="Enter additional details about the feature availability..." rows="4"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeFeatureAvailableModal()">Cancel</button>
+                <button class="btn btn-success" id="submitFeatureAvailableBtn" onclick="submitFeatureAvailable()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rejected Modal -->
+    <div class="modal-overlay" id="rejectedModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Reject DCR</h3>
+                <button class="modal-close" onclick="closeRejectedModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="rejectionNotes">Rejection Notes</label>
+                    <textarea id="rejectionNotes" class="form-textarea" placeholder="Please provide the reason for rejecting this DCR..." rows="6"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRejectedModal()">Cancel</button>
+                <button class="btn btn-danger" id="submitRejectedBtn" onclick="submitRejected()">Reject DCR</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Message Requester Modal -->
+    <div class="modal-overlay" id="messageRequesterModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Request More Information</h3>
+                <button class="modal-close" onclick="closeMessageModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="message-recipient-info">
+                    <div class="recipient-avatar" id="recipientAvatar">JS</div>
+                    <div class="recipient-details">
+                        <span class="recipient-name" id="recipientName">John Smith</span>
+                        <span class="recipient-dcr" id="recipientDcr">DCR-1001</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="messageSubject">Subject</label>
+                    <input type="text" id="messageSubject" class="form-input" placeholder="Additional information needed for your DCR">
+                </div>
+                <div class="form-group">
+                    <label>Quick Templates</label>
+                    <div class="message-templates">
+                        <button class="template-btn" onclick="applyTemplate('useCase')">Use Case Details</button>
+                        <button class="template-btn" onclick="applyTemplate('impact')">Customer Impact</button>
+                        <button class="template-btn" onclick="applyTemplate('technical')">Technical Requirements</button>
+                        <button class="template-btn" onclick="applyTemplate('priority')">Priority Justification</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="messageBody">Message</label>
+                    <textarea id="messageBody" class="form-textarea" placeholder="Write your message to the requester..." rows="8"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="ccTriageOwner"> <span id="ccTriageOwnerLabel">CC CSS triage owner</span>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeMessageModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="sendMessage()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                    Send Message
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Evidence Gathering Modal -->
+    <div class="modal-overlay" id="evidenceGatheringModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Evidence Gathering</h3>
+                <button class="modal-close" onclick="closeEvidenceGatheringModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="featureRequestSearch">Connect to Feature Request</label>
+                    <div class="search-select-container">
+                        <input type="text" id="featureRequestSearch" class="form-input" placeholder="Search for feature requests..." oninput="filterFeatureRequests()" onfocus="showFeatureDropdown()">
+                        <div class="search-dropdown" id="featureRequestDropdown">
+                            <!-- Options will be populated dynamically -->
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="selectedFeatureDisplay" style="display: none;">
+                    <label>Selected Feature Request</label>
+                    <div class="selected-feature-tag">
+                        <span id="selectedFeatureText"></span>
+                        <button class="remove-feature-btn" onclick="clearSelectedFeature()">&times;</button>
+                    </div>
+                </div>
+                <div class="divider-with-text">
+                    <span>OR</span>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-secondary full-width" onclick="showCreateFeatureForm()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Create New Feature Request
+                    </button>
+                </div>
+                <div id="createFeatureForm" style="display: none;">
+                    <div class="new-feature-form">
+                        <h4>New Feature Request</h4>
+                        <div class="form-group">
+                            <label for="newFeatureTitle">Feature Title</label>
+                            <input type="text" id="newFeatureTitle" class="form-input" placeholder="Enter feature title...">
+                        </div>
+                        <div class="form-group">
+                            <label for="newFeatureProduct">Product</label>
+                            <select id="newFeatureProduct" class="form-select">
+                                <option value="">-- Select Product --</option>
+                                <option value="Defender for Identity">Defender for Identity</option>
+                                <option value="Defender for Endpoint">Defender for Endpoint</option>
+                                <option value="Sentinel">Sentinel</option>
+                                <option value="Defender 365">Defender 365</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="newFeatureDescription">Description</label>
+                            <textarea id="newFeatureDescription" class="form-textarea" placeholder="Describe the feature request..." rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeEvidenceGatheringModal()">Cancel</button>
+                <button class="btn btn-primary" id="submitEvidenceBtn" onclick="submitEvidenceGathering()">Link Feature Request</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const featureAreas = {
+            'Defender for Identity': [
+                'Identity reconnaissance and discovery',
+                'Credential theft detection',
+                'Lateral movement detection',
+                'Privileged account monitoring',
+                'Directory services security posture',
+                'Identity attack path analysis',
+                'Suspicious authentication behavior',
+                'Hybrid identity monitoring',
+                'Investigation and incident correlation',
+                'Alerting and remediation guidance'
+            ],
+            'Defender for Endpoint': [
+                'Endpoint threat detection and response',
+                'Attack surface reduction',
+                'Endpoint vulnerability management',
+                'Malware and ransomware protection',
+                'Behavioral and anomaly detection',
+                'Device and USB control',
+                'Endpoint isolation and containment',
+                'Threat and vulnerability remediation',
+                'Automated investigation and response',
+                'Cross platform endpoint protection'
+            ],
+            'Sentinel': [
+                'Security information and event management',
+                'Log ingestion and normalization',
+                'Threat detection analytics',
+                'Security orchestration and automation',
+                'Incident investigation and response',
+                'Threat intelligence integration',
+                'Proactive threat hunting',
+                'Data connectors and integrations',
+                'SOC visibility and dashboards',
+                'Compliance and audit monitoring'
+            ],
+            'Defender 365': [
+                'Extended detection and response',
+                'Cross domain attack correlation',
+                'Unified incident management',
+                'Threat intelligence driven detections',
+                'Automated investigation and response',
+                'Security posture visibility',
+                'Identity, endpoint, email, and cloud signal fusion',
+                'Analyst workflow optimization',
+                'Attack chain visualization',
+                'Centralized security operations'
+            ]
+        };
+
+        const products = Object.keys(featureAreas);
+        const sources = ['CSS', 'STU', 'CSU', 'FastTrack'];
+        const priorities = ['Critical', 'High', 'Medium', 'Low'];
+        const requesters = ['John Smith', 'Sarah Johnson', 'Michael Chen', 'Emily Davis', 'David Wilson', 'Lisa Anderson', 'Robert Brown', 'Jennifer Taylor'];
+        const customers = ['Contoso Ltd', 'Fabrikam Inc', 'Northwind Traders', 'Adventure Works', 'Woodgrove Bank', 'Litware Inc', 'Tailspin Toys', 'Fourth Coffee', 'Adatum Corp', 'Proseware Inc'];
+        
+        const useCases = [
+            'Enable security teams to quickly identify and respond to identity-based attacks',
+            'Provide automated threat detection for endpoint devices across hybrid environments',
+            'Centralize security monitoring and alerting for SOC teams',
+            'Improve threat hunting capabilities with advanced analytics',
+            'Streamline incident response workflows for faster resolution',
+            'Enhance visibility into attack chains across the organization',
+            'Support compliance requirements with comprehensive audit logging',
+            'Enable proactive security posture management',
+            'Integrate threat intelligence for improved detection accuracy',
+            'Automate routine security operations to reduce analyst workload'
+        ];
+
+        const customerImpacts = [
+            'Critical business operations at risk without timely threat detection',
+            'Potential data breach affecting customer trust and regulatory compliance',
+            'SOC team efficiency reduced by 40% due to manual processes',
+            'Unable to meet SLA requirements for incident response',
+            'Security blind spots in hybrid cloud environment',
+            'Compliance audit findings require immediate remediation',
+            'Customer data exposure risk during lateral movement attacks',
+            'Operational downtime due to ransomware threats',
+            'Inability to detect sophisticated APT attacks',
+            'Resource constraints limiting security coverage'
+        ];
+
+        const descriptions = [
+            'Request to add support for custom detection rules based on behavioral patterns',
+            'Need enhanced integration with third-party SIEM solutions',
+            'Requirement for real-time alerting on privileged account usage',
+            'Request automated remediation workflows for common threat scenarios',
+            'Need improved visibility into cross-domain attack correlation',
+            'Requirement for custom dashboard creation capabilities',
+            'Request API access for security automation workflows',
+            'Need enhanced threat intelligence feed integration',
+            'Requirement for improved incident timeline visualization',
+            'Request support for additional log sources and data connectors',
+            'Need granular role-based access control for security operations',
+            'Requirement for advanced threat hunting query capabilities',
+            'Request automated compliance reporting features',
+            'Need improved mobile device security monitoring',
+            'Requirement for enhanced email threat protection integration'
+        ];
+
+        let dcrData = [];
+        let currentDcr = null;
+        let modalDcr = null;
+
+        function generateRandomDate(start, end) {
+            return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function generateDCRData() {
+            const startDate = new Date('2025-07-01');
+            const endDate = new Date('2026-01-22');
+            
+            for (let i = 1; i <= 15; i++) {
+                const product = products[Math.floor(Math.random() * products.length)];
+                const productAreas = featureAreas[product];
+                const duplicationScore = Math.floor(Math.random() * 100);
+                
+                dcrData.push({
+                    id: 'DCR-' + String(1000 + i).padStart(4, '0'),
+                    product: product,
+                    productArea: productAreas[Math.floor(Math.random() * productAreas.length)],
+                    createdDate: generateRandomDate(startDate, endDate),
+                    requester: requesters[Math.floor(Math.random() * requesters.length)],
+                    customer: customers[Math.floor(Math.random() * customers.length)],
+                    description: descriptions[Math.floor(Math.random() * descriptions.length)],
+                    priority: priorities[Math.floor(Math.random() * priorities.length)],
+                    duplicationScore: duplicationScore,
+                    frExists: Math.random() > 0.5 ? 'Yes' : 'No',
+                    source: sources[Math.floor(Math.random() * sources.length)],
+                    useCase: useCases[Math.floor(Math.random() * useCases.length)],
+                    customerImpact: customerImpacts[Math.floor(Math.random() * customerImpacts.length)],
+                    submittedToPG: false,
+                    submittedProductGroup: null,
+                    submittedFeatureArea: null,
+                    submittedDate: null,
+                    similarCustomers: generateSimilarCustomers(),
+                    matchingFeatures: []
+                });
+            }
+            
+            // Assign matching features based on product
+            dcrData.forEach(function(dcr) {
+                dcr.matchingFeatures = getMatchingFeaturesForProduct(dcr.product, dcr.duplicationScore);
+            });
+        }
+        
+        function generateSimilarCustomers() {
+            const count = Math.floor(Math.random() * 5) + 1;
+            const shuffled = customers.slice().sort(function() { return 0.5 - Math.random(); });
+            return shuffled.slice(0, count);
+        }
+        
+        function getMatchingFeaturesForProduct(product, duplicationScore) {
+            const productFeatures = existingFeatureRequests.filter(function(fr) {
+                return fr.product === product;
+            });
+            
+            // Return 1-3 matching features with match scores
+            const count = Math.min(Math.floor(Math.random() * 3) + 1, productFeatures.length);
+            const shuffled = productFeatures.slice().sort(function() { return 0.5 - Math.random(); });
+            
+            return shuffled.slice(0, count).map(function(fr, index) {
+                const baseScore = duplicationScore > 70 ? 85 : (duplicationScore > 40 ? 65 : 45);
+                const matchScore = Math.min(98, baseScore + Math.floor(Math.random() * 15) - (index * 10));
+                return {
+                    ...fr,
+                    matchScore: matchScore
+                };
+            }).sort(function(a, b) { return b.matchScore - a.matchScore; });
+        }
+
+        function renderMainTable() {
+            const tbody = document.getElementById('dcrTableBody');
+            tbody.innerHTML = '';
+            
+            dcrData.forEach(function(dcr) {
+                const row = document.createElement('tr');
+                row.className = 'clickable';
+                
+                let submitCell = '';
+                if (dcr.submittedToPG) {
+                    submitCell = '<span class="submitted-indicator"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Submitted</span>';
+                } else {
+                    submitCell = '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openSubmitModal(\'' + dcr.id + '\')">Submit to PG</button>';
+                }
+                
+                const dupClass = dcr.duplicationScore >= 70 ? 'high' : (dcr.duplicationScore >= 40 ? 'medium' : 'low');
+                const duplicationCell = '<span class="duplication-badge ' + dupClass + '">' + dcr.duplicationScore + '%</span>';
+                
+                row.innerHTML = '<td><span class="dcr-id" onclick="showDetailView(\'' + dcr.id + '\')">' + dcr.id + '</span></td>' +
+                    '<td>' + dcr.product + '</td>' +
+                    '<td>' + formatDate(dcr.createdDate) + '</td>' +
+                    '<td><span class="requester-link" onclick="event.stopPropagation(); openMessageModal(\'' + dcr.id + '\')">' + dcr.requester + '</span></td>' +
+                    '<td>' + dcr.customer + '</td>' +
+                    '<td class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
+                    '<td><span class="priority ' + dcr.priority.toLowerCase() + '">' + dcr.priority + '</span></td>' +
+                    '<td>' + duplicationCell + '</td>' +
+                    '<td><span class="fr-badge ' + dcr.frExists.toLowerCase() + '">' + dcr.frExists + '</span></td>' +
+                    '<td><span class="source-badge">' + dcr.source + '</span></td>' +
+                    '<td>' + submitCell + '</td>';
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('queueCount').textContent = dcrData.length;
+        }
+
+        function renderPendingTable() {
+            const pending = dcrData.filter(function(dcr) { return dcr.submittedToPG; });
+            const tbody = document.getElementById('pendingTableBody');
+            const emptyState = document.getElementById('pendingEmptyState');
+            const table = document.getElementById('pendingTable');
+            
+            document.getElementById('pendingCount').textContent = pending.length;
+            
+            if (pending.length === 0) {
+                emptyState.style.display = 'block';
+                table.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            table.style.display = 'block';
+            tbody.innerHTML = '';
+            
+            pending.forEach(function(dcr) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td><span class="dcr-id" onclick="showDetailView(\'' + dcr.id + '\')">' + dcr.id + '</span></td>' +
+                    '<td>' + dcr.product + '</td>' +
+                    '<td>' + dcr.submittedProductGroup + '</td>' +
+                    '<td>' + dcr.submittedFeatureArea + '</td>' +
+                    '<td>' + formatDate(dcr.submittedDate) + '</td>' +
+                    '<td><span class="priority medium">Pending Response</span></td>';
+                tbody.appendChild(row);
+            });
+        }
+
+        function showDetailView(dcrId) {
+            const dcr = dcrData.find(function(d) { return d.id === dcrId; });
+            if (!dcr) return;
+            
+            currentDcr = dcr;
+            
+            document.getElementById('detailBreadcrumb').textContent = dcr.id;
+            document.getElementById('detailTitle').textContent = dcr.id + ' - ' + dcr.product;
+            document.getElementById('detailId').textContent = dcr.id;
+            document.getElementById('detailProduct').textContent = dcr.product;
+            document.getElementById('detailProductArea').textContent = dcr.productArea;
+            document.getElementById('detailSource').textContent = dcr.source;
+            document.getElementById('detailPriorityText').textContent = dcr.priority;
+            document.getElementById('detailRequester').textContent = dcr.requester;
+            document.getElementById('detailCustomer').textContent = dcr.customer;
+            document.getElementById('detailCreatedDate').textContent = formatDate(dcr.createdDate);
+            document.getElementById('detailUseCase').textContent = dcr.useCase;
+            document.getElementById('detailCustomerImpact').textContent = dcr.customerImpact;
+            document.getElementById('detailDescription').textContent = dcr.description;
+            
+            const priorityBadge = document.getElementById('detailPriority');
+            priorityBadge.textContent = dcr.priority;
+            priorityBadge.className = 'priority ' + dcr.priority.toLowerCase();
+            
+            const statusMessage = document.getElementById('detailStatusMessage');
+            if (dcr.submittedToPG) {
+                statusMessage.className = 'status-message success';
+                document.getElementById('detailStatusText').textContent = 'Submitted to ' + dcr.submittedProductGroup + ' - ' + dcr.submittedFeatureArea + ' on ' + formatDate(dcr.submittedDate);
+                document.getElementById('submitToPGBtn').style.display = 'none';
+                document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
+            } else {
+                statusMessage.className = 'status-message';
+                document.getElementById('submitToPGBtn').style.display = 'inline-flex';
+                document.getElementById('revertSubmissionBtn').style.display = 'none';
+            }
+            
+            // Populate Copilot pane
+            populateCopilotPane(dcr);
+            
+            document.getElementById('mainView').classList.add('hidden');
+            document.getElementById('detailView').classList.add('active');
+        }
+        
+        function populateCopilotPane(dcr) {
+            // Similar request count
+            document.getElementById('similarRequestCount').textContent = dcr.similarCustomers.length;
+            
+            // Similar customers
+            const customersContainer = document.getElementById('similarCustomers');
+            customersContainer.innerHTML = '';
+            dcr.similarCustomers.forEach(function(customer) {
+                const tag = document.createElement('span');
+                tag.className = 'customer-tag';
+                tag.textContent = customer;
+                customersContainer.appendChild(tag);
+            });
+            
+            // AI Summary
+            const summaries = aiSummaries[dcr.product] || ['No summary available for this product.'];
+            const summaryIndex = Math.floor(Math.random() * summaries.length);
+            document.getElementById('aiSummary').textContent = summaries[summaryIndex];
+            
+            // Potential matching features
+            const featuresContainer = document.getElementById('potentialFeatures');
+            featuresContainer.innerHTML = '';
+            dcr.matchingFeatures.forEach(function(feature) {
+                const featureEl = document.createElement('div');
+                featureEl.className = 'feature-match';
+                featureEl.onclick = function() {
+                    openFeatureAvailableModalWithFeature(feature);
+                };
+                featureEl.innerHTML = '<div class="feature-match-title">' + feature.title + '</div>' +
+                    '<div class="feature-match-meta">' +
+                        '<span>' + feature.availability + '</span>' +
+                        '<span class="match-score">' + feature.matchScore + '% match</span>' +
+                    '</div>';
+                featuresContainer.appendChild(featureEl);
+            });
+            
+            // Duplication score
+            const dupScore = dcr.duplicationScore;
+            document.getElementById('duplicationFill').style.width = dupScore + '%';
+            document.getElementById('duplicationScoreDetail').textContent = dupScore + '%';
+            
+            let hint = 'Low likelihood of duplicate request';
+            if (dupScore >= 70) {
+                hint = 'High likelihood - consider mapping to existing feature';
+            } else if (dupScore >= 40) {
+                hint = 'Moderate similarity detected with existing requests';
+            }
+            document.getElementById('duplicationHint').textContent = hint;
+        }
+
+        function showMainView() {
+            document.getElementById('mainView').classList.remove('hidden');
+            document.getElementById('detailView').classList.remove('active');
+            currentDcr = null;
+        }
+
+        function openSubmitModal(dcrId) {
+            if (typeof dcrId === 'string') {
+                modalDcr = dcrData.find(function(d) { return d.id === dcrId; });
+            } else {
+                modalDcr = dcrId;
+            }
+            
+            if (!modalDcr) return;
+            
+            const productGroupSelect = document.getElementById('productGroupSelect');
+            productGroupSelect.innerHTML = '<option value="">-- Select Product Group --</option>';
+            products.forEach(function(product) {
+                const option = document.createElement('option');
+                option.value = product;
+                option.textContent = 'Microsoft ' + product;
+                productGroupSelect.appendChild(option);
+            });
+            
+            productGroupSelect.value = modalDcr.product;
+            
+            resetModal();
+            
+            if (modalDcr.product) {
+                onProductGroupChange();
+            }
+            
+            document.getElementById('submitModal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('submitModal').classList.remove('active');
+            resetModal();
+            modalDcr = null;
+        }
+
+        function resetModal() {
+            document.getElementById('modalStep1').style.display = 'block';
+            document.getElementById('modalStep2').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'none';
+            document.getElementById('nextBtn').disabled = !document.getElementById('productGroupSelect').value;
+            
+            document.getElementById('step1').className = 'step active';
+            document.getElementById('step2').className = 'step';
+            document.getElementById('stepLine').className = 'step-line';
+            
+            document.getElementById('featureAreaSelect').innerHTML = '<option value="">-- Select Feature Area --</option>';
+        }
+
+        function onProductGroupChange() {
+            const productGroup = document.getElementById('productGroupSelect').value;
+            document.getElementById('nextBtn').disabled = !productGroup;
+        }
+
+        function goNext() {
+            const productGroup = document.getElementById('productGroupSelect').value;
+            if (!productGroup) return;
+            
+            document.getElementById('step1').className = 'step completed';
+            document.getElementById('step2').className = 'step active';
+            document.getElementById('stepLine').className = 'step-line completed';
+            
+            document.getElementById('modalStep1').style.display = 'none';
+            document.getElementById('modalStep2').style.display = 'block';
+            document.getElementById('selectedProductGroup').textContent = 'Microsoft ' + productGroup;
+            
+            const featureAreaSelect = document.getElementById('featureAreaSelect');
+            featureAreaSelect.innerHTML = '<option value="">-- Select Feature Area --</option>';
+            featureAreas[productGroup].forEach(function(area) {
+                const option = document.createElement('option');
+                option.value = area;
+                option.textContent = area;
+                featureAreaSelect.appendChild(option);
+            });
+            
+            document.getElementById('nextBtn').style.display = 'none';
+            document.getElementById('submitBtn').style.display = 'inline-flex';
+            document.getElementById('backBtn').style.display = 'inline-flex';
+            document.getElementById('submitBtn').disabled = true;
+            
+            featureAreaSelect.onchange = function() {
+                document.getElementById('submitBtn').disabled = !this.value;
+            };
+        }
+
+        function goBack() {
+            document.getElementById('step1').className = 'step active';
+            document.getElementById('step2').className = 'step';
+            document.getElementById('stepLine').className = 'step-line';
+            
+            document.getElementById('modalStep1').style.display = 'block';
+            document.getElementById('modalStep2').style.display = 'none';
+            
+            document.getElementById('nextBtn').style.display = 'inline-flex';
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('backBtn').style.display = 'none';
+        }
+
+        function submitToPG() {
+            const productGroup = document.getElementById('productGroupSelect').value;
+            const featureArea = document.getElementById('featureAreaSelect').value;
+            
+            if (!productGroup || !featureArea || !modalDcr) return;
+            
+            const dcr = dcrData.find(function(d) { return d.id === modalDcr.id; });
+            if (dcr) {
+                dcr.submittedToPG = true;
+                dcr.submittedProductGroup = productGroup;
+                dcr.submittedFeatureArea = featureArea;
+                dcr.submittedDate = new Date();
+            }
+            
+            closeModal();
+            
+            renderMainTable();
+            renderPendingTable();
+            
+            if (currentDcr && currentDcr.id === modalDcr.id) {
+                const statusMessage = document.getElementById('detailStatusMessage');
+                statusMessage.className = 'status-message success';
+                document.getElementById('detailStatusText').textContent = 'Submitted to ' + productGroup + ' - ' + featureArea + ' on ' + formatDate(new Date());
+                document.getElementById('submitToPGBtn').style.display = 'none';
+                document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
+            }
+        }
+
+        function revertSubmission() {
+            if (!currentDcr) return;
+            
+            const dcr = dcrData.find(function(d) { return d.id === currentDcr.id; });
+            if (dcr) {
+                dcr.submittedToPG = false;
+                dcr.submittedProductGroup = null;
+                dcr.submittedFeatureArea = null;
+                dcr.submittedDate = null;
+                
+                // Update the detail view
+                const statusMessage = document.getElementById('detailStatusMessage');
+                statusMessage.className = 'status-message';
+                document.getElementById('detailStatusText').textContent = '';
+                document.getElementById('submitToPGBtn').style.display = 'inline-flex';
+                document.getElementById('revertSubmissionBtn').style.display = 'none';
+                
+                // Update the tables
+                renderMainTable();
+                renderPendingTable();
+            }
+        }
+
+        // Feature Requests data for Evidence Gathering
+        const existingFeatureRequests = [
+            // Microsoft Defender for Identity
+            { id: 'FR-001', title: 'Enhanced hybrid identity attack path visualization across on-prem AD and Entra ID', product: 'Defender for Identity', status: 'In Review', availability: 'Private Preview' },
+            { id: 'FR-002', title: 'Custom detection rules for identity reconnaissance with configurable thresholds', product: 'Defender for Identity', status: 'Approved', availability: 'Generally Available' },
+            { id: 'FR-003', title: 'Improved baselining of service account behavior to reduce false positives', product: 'Defender for Identity', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'FR-004', title: 'Real time credential theft alerting with optional automated response actions', product: 'Defender for Identity', status: 'Approved', availability: 'Generally Available' },
+            { id: 'FR-005', title: 'Identity security posture scoring broken down by domain or forest', product: 'Defender for Identity', status: 'In Review', availability: 'Private Preview' },
+            // Microsoft Defender for Endpoint
+            { id: 'FR-006', title: 'Granular USB device control policies scoped by user group or device risk level', product: 'Defender for Endpoint', status: 'Approved', availability: 'Generally Available' },
+            { id: 'FR-007', title: 'Attack Surface Reduction rule simulation mode showing pre-deployment impact', product: 'Defender for Endpoint', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'FR-008', title: 'Automatic correlation of related EDR alerts across multiple endpoints', product: 'Defender for Endpoint', status: 'Approved', availability: 'Generally Available' },
+            { id: 'FR-009', title: 'Device group scoped malware detection exclusions', product: 'Defender for Endpoint', status: 'In Review', availability: 'Private Preview' },
+            { id: 'FR-010', title: 'Offline investigation and response actions that execute when endpoints reconnect', product: 'Defender for Endpoint', status: 'In Progress', availability: 'Island Preview' },
+            // Microsoft Sentinel
+            { id: 'FR-011', title: 'Log ingestion cost forecasting and what-if analysis before onboarding data sources', product: 'Sentinel', status: 'Approved', availability: 'Generally Available' },
+            { id: 'FR-012', title: 'Native multi-tenant SOC view for MSSPs managing multiple customers', product: 'Sentinel', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'FR-013', title: 'Increased transparency for UEBA analytics with contributing signals and confidence scores', product: 'Sentinel', status: 'In Review', availability: 'Private Preview' },
+            { id: 'FR-014', title: 'One click safe testing mode for SOAR playbooks without impacting production', product: 'Sentinel', status: 'Approved', availability: 'Generally Available' },
+            { id: 'FR-015', title: 'Industry specific advanced threat hunting templates', product: 'Sentinel', status: 'In Progress', availability: 'Public Preview' },
+            // Microsoft Defender 365
+            { id: 'FR-016', title: 'Unified incident severity scoring across identity, endpoint, email, and cloud signals', product: 'Defender 365', status: 'Approved', availability: 'Generally Available' },
+            { id: 'FR-017', title: 'End to end attack chain visualization across Microsoft security products', product: 'Defender 365', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'FR-018', title: 'Customizable analyst investigation workflow dashboards', product: 'Defender 365', status: 'Approved', availability: 'Generally Available' },
+            { id: 'FR-019', title: 'Adaptive alert noise reduction based on customer resolution history', product: 'Defender 365', status: 'In Review', availability: 'Private Preview' },
+            { id: 'FR-020', title: 'Executive ready security posture summaries for leadership reporting', product: 'Defender 365', status: 'In Progress', availability: 'Public Preview' }
+        ];
+
+        // AI summaries for different feature areas
+        const aiSummaries = {
+            'Defender for Identity': [
+                'Multiple enterprise customers are seeking enhanced visibility into identity-based attack paths, particularly in hybrid environments with both on-premises AD and cloud Entra ID. The common thread is the need for real-time detection and automated response to credential theft and lateral movement.',
+                'Organizations require better identity security posture management with granular scoring by domain. Service account monitoring improvements are frequently requested to reduce alert fatigue while maintaining security coverage.'
+            ],
+            'Defender for Endpoint': [
+                'Customers are requesting more granular control over endpoint policies, specifically around USB devices and attack surface reduction rules. There is a strong demand for simulation capabilities before deploying changes to production.',
+                'EDR alert correlation and automated investigation capabilities are top priorities. Organizations need better incident consolidation and the ability to perform response actions on offline endpoints.'
+            ],
+            'Sentinel': [
+                'Cost management and predictability for log ingestion is a major concern across enterprise customers. MSSP customers specifically need multi-tenant views for efficient SOC operations.',
+                'UEBA transparency and playbook testing are recurring themes. Security teams want to understand why alerts are generated and safely test automation before deployment.'
+            ],
+            'Defender 365': [
+                'Unified visibility across all Microsoft security signals is the primary request. Customers want to see attack chains that span identity, endpoint, and email in a single view.',
+                'SOC workflow optimization and executive reporting are key requirements. Adaptive alert management based on organizational context would significantly improve analyst efficiency.'
+            ]
+        };
+
+        let selectedFeatureRequest = null;
+        let selectedRecommendedFeature = null;
+        let isCreatingNewFeature = false;
+        let currentView = 'cxe';
+        let currentPgDcr = null;
+
+        // Feature Already Available Modal functions
+        function openFeatureAvailableModal() {
+            if (!currentDcr) return;
+            document.getElementById('availabilityStatus').value = '';
+            document.getElementById('availabilityNotes').value = '';
+            selectedRecommendedFeature = null;
+            
+            // Populate recommended features
+            populateRecommendedFeatures(currentDcr);
+            
+            document.getElementById('featureAvailableModal').classList.add('active');
+        }
+        
+        function openFeatureAvailableModalWithFeature(feature) {
+            if (!currentDcr) return;
+            document.getElementById('availabilityStatus').value = feature.availability || '';
+            document.getElementById('availabilityNotes').value = 'Mapped to existing feature: ' + feature.id + ' - ' + feature.title;
+            selectedRecommendedFeature = feature;
+            
+            // Populate recommended features
+            populateRecommendedFeatures(currentDcr);
+            
+            // Pre-select the feature
+            setTimeout(function() {
+                const items = document.querySelectorAll('.recommended-feature-item');
+                items.forEach(function(item) {
+                    if (item.dataset.featureId === feature.id) {
+                        item.classList.add('selected');
+                    }
+                });
+            }, 0);
+            
+            document.getElementById('featureAvailableModal').classList.add('active');
+        }
+        
+        function populateRecommendedFeatures(dcr) {
+            const container = document.getElementById('recommendedFeaturesList');
+            container.innerHTML = '';
+            
+            dcr.matchingFeatures.forEach(function(feature) {
+                const item = document.createElement('div');
+                item.className = 'recommended-feature-item';
+                item.dataset.featureId = feature.id;
+                item.onclick = function() {
+                    selectRecommendedFeature(feature, item);
+                };
+                item.innerHTML = '<div class="feature-title">' + feature.id + ': ' + feature.title + '</div>' +
+                    '<div class="feature-meta">' +
+                        '<span>' + feature.product + ' • ' + feature.availability + '</span>' +
+                        '<span class="match-percentage">' + feature.matchScore + '% match</span>' +
+                    '</div>';
+                container.appendChild(item);
+            });
+        }
+        
+        function selectRecommendedFeature(feature, element) {
+            // Remove selection from all items
+            document.querySelectorAll('.recommended-feature-item').forEach(function(item) {
+                item.classList.remove('selected');
+            });
+            
+            // Add selection to clicked item
+            element.classList.add('selected');
+            selectedRecommendedFeature = feature;
+            
+            // Update form fields
+            document.getElementById('availabilityStatus').value = feature.availability || '';
+            document.getElementById('availabilityNotes').value = 'Mapped to existing feature: ' + feature.id + ' - ' + feature.title;
+        }
+
+        function closeFeatureAvailableModal() {
+            document.getElementById('featureAvailableModal').classList.remove('active');
+        }
+
+        function submitFeatureAvailable() {
+            const status = document.getElementById('availabilityStatus').value;
+            const notes = document.getElementById('availabilityNotes').value;
+            
+            if (!status) {
+                alert('Please select an availability status.');
+                return;
+            }
+            
+            if (currentDcr) {
+                currentDcr.triageOutcome = 'Feature Available';
+                currentDcr.availabilityStatus = status;
+                currentDcr.availabilityNotes = notes;
+                currentDcr.triageDate = new Date();
+                currentDcr.mappedFeature = selectedRecommendedFeature;
+                
+                const statusMessage = document.getElementById('detailStatusMessage');
+                statusMessage.className = 'status-message success';
+                
+                let statusText = 'Marked as Feature Already Available (' + status + ')';
+                if (selectedRecommendedFeature) {
+                    statusText += ' - Mapped to ' + selectedRecommendedFeature.id;
+                }
+                statusText += ' on ' + formatDate(new Date());
+                document.getElementById('detailStatusText').textContent = statusText;
+            }
+            
+            selectedRecommendedFeature = null;
+            closeFeatureAvailableModal();
+            renderMainTable();
+        }
+
+        // Rejected Modal functions
+        function openRejectedModal() {
+            if (!currentDcr) return;
+            document.getElementById('rejectionNotes').value = '';
+            document.getElementById('rejectedModal').classList.add('active');
+        }
+
+        function closeRejectedModal() {
+            document.getElementById('rejectedModal').classList.remove('active');
+        }
+
+        function submitRejected() {
+            const notes = document.getElementById('rejectionNotes').value;
+            
+            if (!notes.trim()) {
+                alert('Please provide rejection notes.');
+                return;
+            }
+            
+            if (currentDcr) {
+                currentDcr.triageOutcome = 'Rejected';
+                currentDcr.rejectionNotes = notes;
+                currentDcr.triageDate = new Date();
+                
+                const statusMessage = document.getElementById('detailStatusMessage');
+                statusMessage.className = 'status-message success';
+                statusMessage.style.background = '#fee2e2';
+                statusMessage.style.color = '#dc2626';
+                document.getElementById('detailStatusText').textContent = 'DCR Rejected on ' + formatDate(new Date());
+            }
+            
+            closeRejectedModal();
+            renderMainTable();
+        }
+
+        // Evidence Gathering Modal functions
+        function openEvidenceGatheringModal() {
+            if (!currentDcr) return;
+            document.getElementById('featureRequestSearch').value = '';
+            document.getElementById('selectedFeatureDisplay').style.display = 'none';
+            document.getElementById('createFeatureForm').style.display = 'none';
+            document.getElementById('newFeatureTitle').value = '';
+            document.getElementById('newFeatureProduct').value = currentDcr ? currentDcr.product : '';
+            document.getElementById('newFeatureDescription').value = '';
+            selectedFeatureRequest = null;
+            isCreatingNewFeature = false;
+            populateFeatureDropdown(existingFeatureRequests);
+            document.getElementById('evidenceGatheringModal').classList.add('active');
+        }
+
+        function closeEvidenceGatheringModal() {
+            document.getElementById('evidenceGatheringModal').classList.remove('active');
+            document.getElementById('featureRequestDropdown').classList.remove('active');
+        }
+
+        function populateFeatureDropdown(features) {
+            const dropdown = document.getElementById('featureRequestDropdown');
+            dropdown.innerHTML = '';
+            
+            if (features.length === 0) {
+                dropdown.innerHTML = '<div class="search-dropdown-empty">No matching feature requests found</div>';
+                return;
+            }
+            
+            features.forEach(function(fr) {
+                const item = document.createElement('div');
+                item.className = 'search-dropdown-item';
+                item.innerHTML = '<div class="item-title">' + fr.id + ': ' + fr.title + '</div>' +
+                    '<div class="item-meta">' + fr.product + ' • ' + fr.status + '</div>';
+                item.onclick = function() {
+                    selectFeatureRequest(fr);
+                };
+                dropdown.appendChild(item);
+            });
+        }
+
+        function showFeatureDropdown() {
+            document.getElementById('featureRequestDropdown').classList.add('active');
+        }
+
+        function filterFeatureRequests() {
+            const searchTerm = document.getElementById('featureRequestSearch').value.toLowerCase();
+            const filtered = existingFeatureRequests.filter(function(fr) {
+                return fr.title.toLowerCase().includes(searchTerm) || 
+                       fr.id.toLowerCase().includes(searchTerm) ||
+                       fr.product.toLowerCase().includes(searchTerm);
+            });
+            populateFeatureDropdown(filtered);
+            document.getElementById('featureRequestDropdown').classList.add('active');
+        }
+
+        function selectFeatureRequest(fr) {
+            selectedFeatureRequest = fr;
+            isCreatingNewFeature = false;
+            document.getElementById('featureRequestSearch').value = '';
+            document.getElementById('featureRequestDropdown').classList.remove('active');
+            document.getElementById('selectedFeatureDisplay').style.display = 'block';
+            document.getElementById('selectedFeatureText').textContent = fr.id + ': ' + fr.title;
+            document.getElementById('createFeatureForm').style.display = 'none';
+        }
+
+        function clearSelectedFeature() {
+            selectedFeatureRequest = null;
+            document.getElementById('selectedFeatureDisplay').style.display = 'none';
+        }
+
+        function showCreateFeatureForm() {
+            isCreatingNewFeature = true;
+            selectedFeatureRequest = null;
+            document.getElementById('selectedFeatureDisplay').style.display = 'none';
+            document.getElementById('createFeatureForm').style.display = 'block';
+            if (currentDcr) {
+                document.getElementById('newFeatureProduct').value = currentDcr.product;
+            }
+        }
+
+        function submitEvidenceGathering() {
+            if (isCreatingNewFeature) {
+                const title = document.getElementById('newFeatureTitle').value;
+                const product = document.getElementById('newFeatureProduct').value;
+                const description = document.getElementById('newFeatureDescription').value;
+                
+                if (!title.trim() || !product) {
+                    alert('Please fill in the feature title and product.');
+                    return;
+                }
+                
+                // Create new feature request
+                const newFR = {
+                    id: 'FR-' + String(existingFeatureRequests.length + 1).padStart(3, '0'),
+                    title: title,
+                    product: product,
+                    status: 'New',
+                    description: description
+                };
+                existingFeatureRequests.push(newFR);
+                selectedFeatureRequest = newFR;
+            }
+            
+            if (!selectedFeatureRequest) {
+                alert('Please select or create a feature request.');
+                return;
+            }
+            
+            if (currentDcr) {
+                currentDcr.triageOutcome = 'Evidence Gathering';
+                currentDcr.linkedFeatureRequest = selectedFeatureRequest;
+                currentDcr.triageDate = new Date();
+                
+                const statusMessage = document.getElementById('detailStatusMessage');
+                statusMessage.className = 'status-message success';
+                statusMessage.style.background = '#dbeafe';
+                statusMessage.style.color = '#2563eb';
+                document.getElementById('detailStatusText').textContent = 'Linked to ' + selectedFeatureRequest.id + ': ' + selectedFeatureRequest.title;
+            }
+            
+            closeEvidenceGatheringModal();
+            renderMainTable();
+        }
+
+        // Close dropdowns when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('featureRequestDropdown');
+            const searchInput = document.getElementById('featureRequestSearch');
+            if (dropdown && searchInput && !dropdown.contains(event.target) && event.target !== searchInput) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Message Requester Modal functions
+        let messageDcr = null;
+
+        const messageTemplates = {
+            useCase: {
+                subject: 'Additional Use Case Details Needed - ',
+                body: 'Hi {requester},\n\nThank you for submitting your Design Change Request ({dcrId}).\n\nTo help us better understand and prioritize your request, could you please provide more details about the specific use case?\n\n• What is the primary business scenario this feature would address?\n• How frequently would this capability be used?\n• Who are the primary users/personas that would benefit?\n• Are there any workarounds you are currently using?\n\nPlease reply to this message with the additional information at your earliest convenience.\n\nBest regards,\nDCR Triage Team'
+            },
+            impact: {
+                subject: 'Customer Impact Clarification Needed - ',
+                body: 'Hi {requester},\n\nThank you for your Design Change Request ({dcrId}).\n\nWe would like to better understand the customer impact to help prioritize this request appropriately.\n\n• How many customers/users would benefit from this feature?\n• What is the current business impact without this capability?\n• Are there any compliance or regulatory requirements involved?\n• What is the estimated cost savings or efficiency gain?\n\nYour input will help us make informed decisions about this request.\n\nBest regards,\nDCR Triage Team'
+            },
+            technical: {
+                subject: 'Technical Requirements Needed - ',
+                body: 'Hi {requester},\n\nThank you for submitting DCR {dcrId}.\n\nOur technical team needs additional information to properly evaluate this request:\n\n• What is the current technical environment/setup?\n• Are there any integration requirements with other systems?\n• What are the expected performance or scale requirements?\n• Are there any security or compliance considerations?\n• Do you have any specific implementation preferences?\n\nPlease provide as much technical detail as possible.\n\nBest regards,\nDCR Triage Team'
+            },
+            priority: {
+                subject: 'Priority Justification Required - ',
+                body: 'Hi {requester},\n\nWe have received your Design Change Request ({dcrId}) and noticed it has been marked as high priority.\n\nTo ensure proper prioritization, could you please provide justification for the urgency:\n\n• What is the timeline or deadline driving this request?\n• What are the consequences of not implementing this feature?\n• Are there any critical business events dependent on this?\n• Is this blocking any other initiatives?\n\nThis information will help us align resources appropriately.\n\nBest regards,\nDCR Triage Team'
+            }
+        };
+
+        function openMessageModal(dcrId) {
+            messageDcr = dcrData.find(function(d) { return d.id === dcrId; });
+            if (!messageDcr) return;
+
+            // Set recipient info
+            const initials = messageDcr.requester.split(' ').map(function(n) { return n[0]; }).join('');
+            document.getElementById('recipientAvatar').textContent = initials;
+            document.getElementById('recipientName').textContent = messageDcr.requester;
+            document.getElementById('recipientDcr').textContent = messageDcr.id + ' - ' + messageDcr.product;
+
+            // Clear form
+            document.getElementById('messageSubject').value = 'Additional Information Needed - ' + messageDcr.id;
+            document.getElementById('messageBody').value = '';
+            document.getElementById('ccTriageOwner').checked = false;
+            document.getElementById('ccTriageOwnerLabel').textContent = 'CC ' + messageDcr.source + ' triage owner';
+
+            document.getElementById('messageRequesterModal').classList.add('active');
+        }
+
+        function closeMessageModal() {
+            document.getElementById('messageRequesterModal').classList.remove('active');
+            messageDcr = null;
+        }
+
+        function applyTemplate(templateKey) {
+            if (!messageDcr || !messageTemplates[templateKey]) return;
+
+            const template = messageTemplates[templateKey];
+            const subject = template.subject + messageDcr.id;
+            const body = template.body
+                .replace('{requester}', messageDcr.requester.split(' ')[0])
+                .replace(/{dcrId}/g, messageDcr.id);
+
+            document.getElementById('messageSubject').value = subject;
+            document.getElementById('messageBody').value = body;
+        }
+
+        function sendMessage() {
+            const subject = document.getElementById('messageSubject').value;
+            const body = document.getElementById('messageBody').value;
+
+            if (!subject.trim() || !body.trim()) {
+                alert('Please enter a subject and message body.');
+                return;
+            }
+
+            // Simulate sending message
+            alert('Message sent successfully to ' + messageDcr.requester + '!\n\nSubject: ' + subject);
+            
+            // Track that a message was sent
+            if (messageDcr) {
+                messageDcr.messagesSent = (messageDcr.messagesSent || 0) + 1;
+                messageDcr.lastMessageDate = new Date();
+            }
+
+            closeMessageModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            generateDCRData();
+            renderMainTable();
+            renderPendingTable();
+            updatePgBadgeCount();
+        });
+
+        // View Switching Functions
+        function switchView(view) {
+            currentView = view;
+            
+            const cxeBtn = document.getElementById('cxeToggleBtn');
+            const pgBtn = document.getElementById('pgToggleBtn');
+            const mainView = document.getElementById('mainView');
+            const pgTriageView = document.getElementById('pgTriageView');
+            const detailView = document.getElementById('detailView');
+            const pgDetailView = document.getElementById('pgDetailView');
+            
+            // Hide all detail views
+            detailView.classList.remove('active');
+            pgDetailView.classList.remove('active');
+            
+            if (view === 'cxe') {
+                cxeBtn.classList.add('active');
+                cxeBtn.classList.remove('pg-active');
+                pgBtn.classList.remove('active');
+                mainView.classList.remove('hidden');
+                pgTriageView.classList.remove('active');
+            } else {
+                pgBtn.classList.add('active');
+                pgBtn.classList.add('pg-active');
+                cxeBtn.classList.remove('active');
+                mainView.classList.add('hidden');
+                pgTriageView.classList.add('active');
+                renderPgTable();
+            }
+        }
+
+        function updatePgBadgeCount() {
+            const pending = dcrData.filter(function(dcr) { return dcr.submittedToPG && !dcr.pgTriageOutcome; });
+            document.getElementById('pgBadgeCount').textContent = pending.length;
+        }
+
+        function renderPgTable() {
+            const pgDcrs = dcrData.filter(function(dcr) { return dcr.submittedToPG; });
+            const tbody = document.getElementById('pgTableBody');
+            const emptyState = document.getElementById('pgEmptyState');
+            const tableContainer = document.getElementById('pgTableContainer');
+            
+            document.getElementById('pgQueueCount').textContent = pgDcrs.length;
+            
+            if (pgDcrs.length === 0) {
+                emptyState.style.display = 'block';
+                tableContainer.style.display = 'none';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            tableContainer.style.display = 'block';
+            tbody.innerHTML = '';
+            
+            pgDcrs.forEach(function(dcr) {
+                const row = document.createElement('tr');
+                row.className = 'clickable';
+                row.onclick = function() { showPgDetailView(dcr.id); };
+                
+                let statusBadge = '<span class="pg-status-badge pending">Pending Review</span>';
+                if (dcr.pgTriageOutcome === 'Rejected') {
+                    statusBadge = '<span class="pg-status-badge rejected">Rejected</span>';
+                } else if (dcr.pgTriageOutcome === 'Approved') {
+                    statusBadge = '<span class="pg-status-badge approved">Approved</span>';
+                } else if (dcr.pgTriageOutcome === 'Backlog') {
+                    statusBadge = '<span class="pg-status-badge backlog">Added to Backlog</span>';
+                }
+                
+                row.innerHTML = '<td><span class="dcr-id">' + dcr.id + '</span></td>' +
+                    '<td>' + dcr.product + '</td>' +
+                    '<td>' + dcr.submittedFeatureArea + '</td>' +
+                    '<td>' + formatDate(dcr.submittedDate) + '</td>' +
+                    '<td>' + dcr.requester + '</td>' +
+                    '<td>' + dcr.customer + '</td>' +
+                    '<td class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
+                    '<td><span class="priority ' + dcr.priority.toLowerCase() + '">' + dcr.priority + '</span></td>' +
+                    '<td><span class="source-badge">' + dcr.source + '</span></td>' +
+                    '<td>' + statusBadge + '</td>';
+                tbody.appendChild(row);
+            });
+        }
+
+        function showPgDetailView(dcrId) {
+            const dcr = dcrData.find(function(d) { return d.id === dcrId; });
+            if (!dcr) return;
+            
+            currentPgDcr = dcr;
+            
+            document.getElementById('pgDetailBreadcrumb').textContent = dcr.id;
+            document.getElementById('pgDetailTitle').textContent = dcr.id + ' - ' + dcr.product;
+            document.getElementById('pgDetailId').textContent = dcr.id;
+            document.getElementById('pgDetailProduct').textContent = dcr.product;
+            document.getElementById('pgDetailFeatureArea').textContent = dcr.submittedFeatureArea;
+            document.getElementById('pgDetailSource').textContent = dcr.source;
+            document.getElementById('pgDetailPriorityText').textContent = dcr.priority;
+            document.getElementById('pgDetailRequester').textContent = dcr.requester;
+            document.getElementById('pgDetailCustomer').textContent = dcr.customer;
+            document.getElementById('pgDetailSubmittedDate').textContent = formatDate(dcr.submittedDate);
+            document.getElementById('pgDetailUseCase').textContent = dcr.useCase;
+            document.getElementById('pgDetailCustomerImpact').textContent = dcr.customerImpact;
+            document.getElementById('pgDetailDescription').textContent = dcr.description;
+            
+            const priorityBadge = document.getElementById('pgDetailPriority');
+            priorityBadge.textContent = dcr.priority;
+            priorityBadge.className = 'priority ' + dcr.priority.toLowerCase();
+            
+            // Populate PG Copilot pane
+            document.getElementById('pgInfoProductGroup').textContent = dcr.submittedProductGroup;
+            document.getElementById('pgInfoFeatureArea').textContent = dcr.submittedFeatureArea;
+            document.getElementById('pgInfoSubmittedDate').textContent = formatDate(dcr.submittedDate);
+            
+            document.getElementById('pgSimilarRequestCount').textContent = dcr.similarCustomers.length;
+            
+            const customersContainer = document.getElementById('pgSimilarCustomers');
+            customersContainer.innerHTML = '';
+            dcr.similarCustomers.forEach(function(customer) {
+                const tag = document.createElement('span');
+                tag.className = 'customer-tag';
+                tag.textContent = customer;
+                customersContainer.appendChild(tag);
+            });
+            
+            // Roadmap alignment
+            const roadmapContainer = document.getElementById('roadmapAlignment');
+            const alignments = ['aligned', 'partial', 'not-aligned'];
+            const alignmentLabels = ['Aligned with H1 2026 roadmap', 'Partial alignment with roadmap', 'Not currently on roadmap'];
+            const randomAlignment = Math.floor(Math.random() * 3);
+            roadmapContainer.innerHTML = '<div class="roadmap-item ' + alignments[randomAlignment] + '">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+                (randomAlignment === 0 ? '<polyline points="20 6 9 17 4 12"></polyline>' : 
+                 randomAlignment === 1 ? '<line x1="5" y1="12" x2="19" y2="12"></line>' :
+                 '<line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>') +
+                '</svg>' + alignmentLabels[randomAlignment] + '</div>';
+            
+            // Engineering estimates
+            const complexities = ['Low', 'Medium', 'High'];
+            const efforts = ['1 sprint', '2-3 sprints', '1 quarter', '2 quarters'];
+            const dependencies = ['None', 'Low', 'Medium', 'High'];
+            document.getElementById('estimateComplexity').textContent = complexities[Math.floor(Math.random() * 3)];
+            document.getElementById('estimateEffort').textContent = efforts[Math.floor(Math.random() * 4)];
+            document.getElementById('estimateDependencies').textContent = dependencies[Math.floor(Math.random() * 4)];
+            
+            // Status message
+            const statusMessage = document.getElementById('pgDetailStatusMessage');
+            if (dcr.pgTriageOutcome) {
+                statusMessage.className = 'status-message success';
+                if (dcr.pgTriageOutcome === 'Rejected') {
+                    statusMessage.style.background = '#fee2e2';
+                    statusMessage.style.color = '#dc2626';
+                }
+                document.getElementById('pgDetailStatusText').textContent = 'PG Decision: ' + dcr.pgTriageOutcome + ' on ' + formatDate(dcr.pgTriageDate);
+            } else {
+                statusMessage.className = 'status-message';
+            }
+            
+            document.getElementById('pgTriageView').classList.remove('active');
+            document.getElementById('pgDetailView').classList.add('active');
+        }
+
+        function showPgMainView() {
+            document.getElementById('pgDetailView').classList.remove('active');
+            document.getElementById('pgTriageView').classList.add('active');
+            currentPgDcr = null;
+            renderPgTable();
+        }
+
+        // PG Rejection Modal
+        function openPgRejectedModal() {
+            if (!currentPgDcr) return;
+            document.getElementById('pgRejectionReason').value = '';
+            document.getElementById('pgRejectionNotes').value = '';
+            document.getElementById('pgRejectedModal').classList.add('active');
+        }
+
+        function closePgRejectedModal() {
+            document.getElementById('pgRejectedModal').classList.remove('active');
+        }
+
+        function submitPgRejected() {
+            const reason = document.getElementById('pgRejectionReason').value;
+            const notes = document.getElementById('pgRejectionNotes').value;
+            
+            if (!reason) {
+                alert('Please select a rejection reason.');
+                return;
+            }
+            
+            if (!notes.trim()) {
+                alert('Please provide rejection notes.');
+                return;
+            }
+            
+            if (currentPgDcr) {
+                currentPgDcr.pgTriageOutcome = 'Rejected';
+                currentPgDcr.pgRejectionReason = reason;
+                currentPgDcr.pgRejectionNotes = notes;
+                currentPgDcr.pgTriageDate = new Date();
+                
+                const statusMessage = document.getElementById('pgDetailStatusMessage');
+                statusMessage.className = 'status-message success';
+                statusMessage.style.background = '#fee2e2';
+                statusMessage.style.color = '#dc2626';
+                document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Rejected (' + reason + ') on ' + formatDate(new Date());
+            }
+            
+            closePgRejectedModal();
+            updatePgBadgeCount();
+        }
+
+        // Placeholder functions for other PG actions
+        function openPgApprovedModal() {
+            if (!currentPgDcr) return;
+            currentPgDcr.pgTriageOutcome = 'Approved';
+            currentPgDcr.pgTriageDate = new Date();
+            
+            const statusMessage = document.getElementById('pgDetailStatusMessage');
+            statusMessage.className = 'status-message success';
+            statusMessage.style.background = '#d1fae5';
+            statusMessage.style.color = '#059669';
+            document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Approved on ' + formatDate(new Date());
+            updatePgBadgeCount();
+        }
+
+        function openPgBacklogModal() {
+            if (!currentPgDcr) return;
+            currentPgDcr.pgTriageOutcome = 'Backlog';
+            currentPgDcr.pgTriageDate = new Date();
+            
+            const statusMessage = document.getElementById('pgDetailStatusMessage');
+            statusMessage.className = 'status-message success';
+            statusMessage.style.background = '#dbeafe';
+            statusMessage.style.color = '#2563eb';
+            document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Added to Backlog on ' + formatDate(new Date());
+            updatePgBadgeCount();
+        }
+
+        function openPgMoreInfoModal() {
+            if (!currentPgDcr) return;
+            alert('Request for more information sent to CxE team for ' + currentPgDcr.id);
+        }
+    </script>
+</body>
+</html>

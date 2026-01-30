@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCR Triage System</title>
+    <title>Unified Product Insights - Microsoft Security, DCR triage system</title>
     <style>
         * {
             margin: 0;
@@ -109,6 +109,84 @@
         .view-toggle-btn:not(.active) .view-badge {
             background: #f59e0b;
             color: white;
+        }
+
+        /* Performance Metrics Styles */
+        .metrics-dashboard {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric-card.red {
+            border-left: 4px solid #dc2626;
+        }
+
+        .metric-card.green {
+            border-left: 4px solid #059669;
+        }
+
+        .metric-card.yellow {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #6b7280;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 4px;
+        }
+
+        .metric-card.red .metric-value {
+            color: #dc2626;
+        }
+
+        .metric-card.green .metric-value {
+            color: #059669;
+        }
+
+        .metric-card.yellow .metric-value {
+            color: #f59e0b;
+        }
+
+        .metric-subtitle {
+            font-size: 13px;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 1200px) {
+            .metrics-dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .metrics-dashboard {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* PG Triage View Styles */
@@ -224,6 +302,113 @@
         .pg-status-badge.backlog {
             background: #dbeafe;
             color: #2563eb;
+        }
+
+        .pg-status-badge.more-info {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        /* ADO Item View Styles */
+        .ado-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .ado-title-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .ado-scenario {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .ado-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .ado-meta {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .ado-status-select {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            background: #fff;
+            min-width: 200px;
+        }
+
+        .ado-section {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .ado-section h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .ado-description {
+            font-size: 14px;
+            color: #1f2937;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .ado-field-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .ado-field {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .ado-field span {
+            display: block;
+            color: #6b7280;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 4px;
+        }
+
+        @media (max-width: 1024px) {
+            .ado-field-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 640px) {
+            .ado-field-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         .nav-breadcrumb {
@@ -362,24 +547,57 @@
             font-weight: 500;
         }
 
-        .priority.critical {
+        .priority.p0 {
             background: #fee2e2;
             color: #dc2626;
         }
 
-        .priority.high {
-            background: #ffedd5;
-            color: #ea580c;
-        }
-
-        .priority.medium {
+        .priority.p1 {
             background: #fef3c7;
             color: #d97706;
         }
 
-        .priority.low {
+        .priority.p2 {
             background: #d1fae5;
             color: #059669;
+        }
+
+        .decision-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .decision-badge.rejected {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .decision-badge.available {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .decision-badge.request-info {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .decision-badge.in-dev {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        .decision-badge.backlog {
+            background: #e9d5ff;
+            color: #7c3aed;
+        }
+
+        .decision-badge.gathering {
+            background: #f3f4f6;
+            color: #6b7280;
         }
 
         .fr-badge {
@@ -737,14 +955,22 @@
             border-radius: 8px;
             margin-top: 16px;
             display: none;
-            align-items: center;
+            align-items: flex-start;
             gap: 8px;
+            flex-direction: column;
         }
 
         .status-message.success {
             display: flex;
             background: #d1fae5;
             color: #059669;
+        }
+
+        .status-message.error {
+            display: flex;
+            background: #fee2e2;
+            color: #dc2626;
+            border-left: 4px solid #dc2626;
         }
 
         .status-message svg {
@@ -1400,30 +1626,35 @@
                         <polyline points="10 9 9 9 8 9"></polyline>
                     </svg>
                 </div>
-                MTP Feature Request &amp; DCR Triage System
+                Unified Product Insights - Microsoft Security, DCR triage system
             </h1>
             <p>Manage and triage Design Change Requests across Microsoft Security products</p>
         </div>
 
-        <div class="view-toggle">
-            <button class="view-toggle-btn active" id="cxeToggleBtn" onclick="switchView('cxe')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                    <circle cx="9" cy="7" r="4"></circle>
-                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                </svg>
-                CxE Triage
-            </button>
-            <button class="view-toggle-btn" id="pgToggleBtn" onclick="switchView('pg')">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-                    <path d="M2 17l10 5 10-5"></path>
-                    <path d="M2 12l10 5 10-5"></path>
-                </svg>
-                PG Triage
-                <span class="view-badge" id="pgBadgeCount">0</span>
-            </button>
+
+
+        <!-- Performance Metrics Dashboard -->
+        <div class="metrics-dashboard" id="metricsDashboard">
+            <div class="metric-card" id="metricSLA">
+                <div class="metric-label">SLA Performance</div>
+                <div class="metric-value" id="slaValue">0</div>
+                <div class="metric-subtitle">days average</div>
+            </div>
+            <div class="metric-card" id="metricQueue">
+                <div class="metric-label">Total DCRs in Queue</div>
+                <div class="metric-value" id="queueValue">0</div>
+                <div class="metric-subtitle">items pending triage</div>
+            </div>
+            <div class="metric-card" id="metricPG">
+                <div class="metric-label">Pending PG Response</div>
+                <div class="metric-value" id="pgValue">0</div>
+                <div class="metric-subtitle">items submitted to PG</div>
+            </div>
+            <div class="metric-card" id="metricMoreInfo">
+                <div class="metric-label">Request More Info</div>
+                <div class="metric-value" id="moreInfoValue">0</div>
+                <div class="metric-subtitle">items awaiting response</div>
+            </div>
         </div>
 
         <div id="mainView" class="main-view">
@@ -1496,6 +1727,7 @@
                                         <th>Submitted Date</th>
                                         <th>Days Since Created</th>
                                         <th>Status</th>
+                                        <th>Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="pendingTableBody"></tbody>
@@ -1536,6 +1768,7 @@
                                         <th>Customer Name</th>
                                         <th>Description</th>
                                         <th>Priority</th>
+                                        <th>Decision</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -1659,7 +1892,7 @@
                         </svg>
                         <span id="pgDetailTitle">DCR Details</span>
                     </h2>
-                    <span class="priority" id="pgDetailPriority">Medium</span>
+                    <span class="priority p1" id="pgDetailPriority">P1</span>
                 </div>
                 <div class="card-body">
                     <div class="detail-grid">
@@ -1743,6 +1976,13 @@
                             </svg>
                             <span id="pgDetailStatusText"></span>
                         </div>
+                        <button class="btn btn-primary" id="pgViewAdoBtn" onclick="showAdoItemView(currentPgDcr.id)" style="margin-top: 12px;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                            </svg>
+                            View ADO Item
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1842,6 +2082,98 @@
             </div>
         </div>
 
+        <!-- ADO Item View -->
+        <div id="adoItemView" class="detail-view">
+            <nav class="nav-breadcrumb">
+                <a onclick="showAdoBackView()">&#8592; Back</a>
+                <span>/</span>
+                <span id="adoBreadcrumb">Scenario 00000000</span>
+            </nav>
+
+            <div class="card animate-in">
+                <div class="ado-header">
+                    <div class="ado-title-block">
+                        <span class="ado-scenario" id="adoScenarioId">Scenario 00000000</span>
+                        <span class="ado-title" id="adoTitle">DCR Title</span>
+                        <div class="ado-meta">
+                            <span id="adoCreatedDate">Created: -</span>
+                            <span id="adoAreaPath">Area: -</span>
+                            <span id="adoIteration">Iteration: -</span>
+                        </div>
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:12px; color:#6b7280; margin-bottom:6px; text-transform:uppercase; letter-spacing:0.04em;">Status</label>
+                        <span id="adoStatusBadge" class="pg-status-badge pending" style="font-size:14px; padding:8px 16px;">Pending Review</span>
+                    </div>
+                </div>
+
+                <div class="ado-section">
+                    <h4>Description</h4>
+                    <div class="ado-description" id="adoDescription">-</div>
+                </div>
+
+                <div class="ado-section" id="adoActionsSection">
+                    <h4>PG Triage Decision</h4>
+                    <div class="detail-actions">
+                        <div class="decision-picker">
+                            <button class="decision-btn" onclick="openAdoRejectedModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                                Rejected
+                            </button>
+                            <button class="decision-btn" onclick="openAdoRequestInfoModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                                Request More Information
+                            </button>
+                            <button class="decision-btn" onclick="openAdoAvailableModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                Generally Available
+                            </button>
+                            <button class="decision-btn" onclick="openAdoInDevModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="16 18 22 12 16 6"></polyline>
+                                    <polyline points="8 6 2 12 8 18"></polyline>
+                                </svg>
+                                In Development
+                            </button>
+                            <button class="decision-btn" onclick="openAdoBacklogModal()">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                                </svg>
+                                Added to Backlog
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ado-section">
+                    <h4>Details</h4>
+                    <div class="ado-field-grid">
+                        <div class="ado-field"><span>DCR ID</span><div id="adoDcrId">-</div></div>
+                        <div class="ado-field"><span>Product</span><div id="adoProduct">-</div></div>
+                        <div class="ado-field"><span>Feature Area</span><div id="adoFeatureArea">-</div></div>
+                        <div class="ado-field"><span>Priority</span><div id="adoPriority">-</div></div>
+                        <div class="ado-field"><span>Requester</span><div id="adoRequester">-</div></div>
+                        <div class="ado-field"><span>Customer</span><div id="adoCustomer">-</div></div>
+                        <div class="ado-field"><span>Source</span><div id="adoSource">-</div></div>
+                        <div class="ado-field"><span>Product Group</span><div id="adoProductGroup">-</div></div>
+                        <div class="ado-field"><span>Submitted Date</span><div id="adoSubmittedDate">-</div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- PG Rejected Modal -->
         <div class="modal-overlay" id="pgRejectedModal">
             <div class="modal">
@@ -1906,6 +2238,170 @@
             </div>
         </div>
 
+        <!-- ADO Rejected Modal -->
+        <div class="modal-overlay" id="adoRejectedModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Reject DCR</h3>
+                    <button class="modal-close" onclick="closeAdoRejectedModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="adoRejectionReason">Rejection Reason</label>
+                        <select id="adoRejectionReason">
+                            <option value="">-- Select Reason --</option>
+                            <option value="Out of Scope">Out of Scope</option>
+                            <option value="Technical Limitations">Technical Limitations</option>
+                            <option value="Resource Constraints">Resource Constraints</option>
+                            <option value="Duplicate Request">Duplicate Request</option>
+                            <option value="Not Aligned with Roadmap">Not Aligned with Roadmap</option>
+                            <option value="Insufficient Business Case">Insufficient Business Case</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adoRejectionNotes">Rejection Notes</label>
+                        <textarea id="adoRejectionNotes" class="form-textarea" placeholder="Please provide detailed explanation for rejecting this DCR..." rows="6"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeAdoRejectedModal()">Cancel</button>
+                    <button class="btn btn-danger" onclick="submitAdoRejected()">Save & Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADO Request More Info Modal -->
+        <div class="modal-overlay" id="adoRequestInfoModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Request More Information</h3>
+                    <button class="modal-close" onclick="closeAdoRequestInfoModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="adoInfoRequested">Information Requested</label>
+                        <textarea id="adoInfoRequested" class="form-textarea" placeholder="Specify what additional information is needed from CxE..." rows="6"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeAdoRequestInfoModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitAdoRequestInfo()">Save & Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADO Generally Available Modal -->
+        <div class="modal-overlay" id="adoAvailableModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Feature Generally Available</h3>
+                    <button class="modal-close" onclick="closeAdoAvailableModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="adoDocumentationLink">Link to Documentation</label>
+                        <input id="adoDocumentationLink" class="form-input" type="text" placeholder="https://docs.microsoft.com/..." />
+                    </div>
+                    <div class="form-group">
+                        <label for="adoAvailableNotes">Additional Notes</label>
+                        <textarea id="adoAvailableNotes" class="form-textarea" placeholder="Any additional context about the available feature..." rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeAdoAvailableModal()">Cancel</button>
+                    <button class="btn btn-success" onclick="submitAdoAvailable()">Save & Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADO In Development Modal -->
+        <div class="modal-overlay" id="adoInDevModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Feature In Development</h3>
+                    <button class="modal-close" onclick="closeAdoInDevModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="adoDevPhase">Development Phase</label>
+                        <select id="adoDevPhase">
+                            <option value="">-- Select Phase --</option>
+                            <option value="In Development">In Development</option>
+                            <option value="Private Preview">Private Preview</option>
+                            <option value="Public Preview">Public Preview</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="adoDevLink">Link to ADO Item</label>
+                        <input id="adoDevLink" class="form-input" type="text" placeholder="ADO work item link or ID" />
+                    </div>
+                    <div class="form-group">
+                        <label for="adoDevNotes">Additional Notes</label>
+                        <textarea id="adoDevNotes" class="form-textarea" placeholder="Timeline, dependencies, or other context..." rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeAdoInDevModal()">Cancel</button>
+                    <button class="btn btn-success" onclick="submitAdoInDev()">Save & Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADO Backlog Modal -->
+        <div class="modal-overlay" id="adoBacklogModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Add to Backlog</h3>
+                    <button class="modal-close" onclick="closeAdoBacklogModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="adoUseCurrentItem" onchange="toggleAdoBacklogLink()" checked />
+                            Use current ADO item
+                        </label>
+                    </div>
+                    <div class="form-group" id="adoBacklogLinkGroup" style="display:none;">
+                        <label for="adoBacklogLink">Link to Existing ADO Item</label>
+                        <input id="adoBacklogLink" class="form-input" type="text" placeholder="ADO work item link or ID" />
+                    </div>
+                    <div class="form-group">
+                        <label for="adoBacklogNotes">Additional Notes</label>
+                        <textarea id="adoBacklogNotes" class="form-textarea" placeholder="Priority, target release, or other context..." rows="4"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeAdoBacklogModal()">Cancel</button>
+                    <button class="btn btn-success" onclick="submitAdoBacklog()">Save & Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Respond to PG Request Modal -->
+        <div class="modal-overlay" id="respondToPgModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>Provide Information to PG</h3>
+                    <button class="modal-close" onclick="closeRespondToPgModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group" style="background:#f9fafb; padding:12px; border-radius:6px; margin-bottom:16px;">
+                        <label style="font-weight:600; color:#374151; margin-bottom:4px;">PG Requested:</label>
+                        <p id="pgRequestedInfo" style="color:#6b7280; margin:0;"></p>
+                    </div>
+                    <div class="form-group">
+                        <label for="cxeResponseInfo">Your Response</label>
+                        <textarea id="cxeResponseInfo" class="form-textarea" placeholder="Provide the requested information..." rows="8"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeRespondToPgModal()">Cancel</button>
+                    <button class="btn btn-success" onclick="submitRespondToPg()">Submit Response</button>
+                </div>
+            </div>
+        </div>
+
         <div id="detailView" class="detail-view">
             <nav class="nav-breadcrumb">
                 <a onclick="showMainView()">&#8592; Back to Queue</a>
@@ -1924,7 +2420,7 @@
                         </svg>
                         <span id="detailTitle">DCR Details</span>
                     </h2>
-                    <span class="priority" id="detailPriority">Medium</span>
+                    <span class="priority p1" id="detailPriority">P1</span>
                 </div>
                 <div class="card-body">
                     <div class="detail-grid">
@@ -2465,7 +2961,7 @@
 
         const products = Object.keys(featureAreas);
         const sources = ['CSS', 'STU', 'CSU', 'FastTrack'];
-        const priorities = ['Critical', 'High', 'Medium', 'Low'];
+        const priorities = ['P0', 'P1', 'P2'];
         const requesters = ['John Smith', 'Sarah Johnson', 'Michael Chen', 'Emily Davis', 'David Wilson', 'Lisa Anderson', 'Robert Brown', 'Jennifer Taylor'];
         const customers = ['Contoso Ltd', 'Fabrikam Inc', 'Northwind Traders', 'Adventure Works', 'Woodgrove Bank', 'Litware Inc', 'Tailspin Toys', 'Fourth Coffee', 'Adatum Corp', 'Proseware Inc'];
         
@@ -2525,6 +3021,14 @@
             return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         }
 
+        function generateAdoId() {
+            return String(Math.floor(20000000 + Math.random() * 80000000));
+        }
+
+        function getAdoLinkHtml(dcrId) {
+            return '<a href="#" onclick="showAdoItemView(\'' + dcrId + '\'); return false;" style="color:#2563eb; text-decoration:underline;">View ADO item</a>';
+        }
+
         function getDaysSinceCreatedBadge(createdDate) {
             const today = new Date();
             const created = new Date(createdDate);
@@ -2542,6 +3046,63 @@
             return '<span class="' + badgeClass + '">' + daysPassed + ' days</span>';
         }
 
+        function updateMetrics() {
+            // 1. SLA in days - random number between 10-45, where 21+ is red
+            const slaValue = Math.floor(Math.random() * (45 - 10 + 1)) + 10;
+            document.getElementById('slaValue').textContent = slaValue;
+            const slaCard = document.getElementById('metricSLA');
+            slaCard.className = 'metric-card';
+            if (slaValue >= 21) {
+                slaCard.classList.add('red');
+            } else {
+                slaCard.classList.add('green');
+            }
+
+            // 2. Total DCRs in queue - current table count, 20+ is red
+            const mainItems = dcrData.filter(function(dcr) {
+                return !dcr.triageOutcome && !(dcr.messagesSent && dcr.messagesSent > 0);
+            });
+            const queueCount = mainItems.length;
+            document.getElementById('queueValue').textContent = queueCount;
+            const queueCard = document.getElementById('metricQueue');
+            queueCard.className = 'metric-card';
+            if (queueCount >= 20) {
+                queueCard.classList.add('red');
+            } else {
+                queueCard.classList.add('green');
+            }
+
+            // 3. Total items pending PG - items submitted to PG
+            const pgPendingCount = dcrData.filter(function(dcr) {
+                return dcr.submittedToPG;
+            }).length;
+            document.getElementById('pgValue').textContent = pgPendingCount;
+            const pgCard = document.getElementById('metricPG');
+            pgCard.className = 'metric-card';
+            if (pgPendingCount >= 20) {
+                pgCard.classList.add('red');
+            } else if (pgPendingCount >= 10) {
+                pgCard.classList.add('yellow');
+            } else {
+                pgCard.classList.add('green');
+            }
+
+            // 4. Total items requesting more information
+            const moreInfoCount = dcrData.filter(function(dcr) {
+                return dcr.messagesSent && dcr.messagesSent > 0;
+            }).length;
+            document.getElementById('moreInfoValue').textContent = moreInfoCount;
+            const moreInfoCard = document.getElementById('metricMoreInfo');
+            moreInfoCard.className = 'metric-card';
+            if (moreInfoCount >= 15) {
+                moreInfoCard.classList.add('red');
+            } else if (moreInfoCount >= 8) {
+                moreInfoCard.classList.add('yellow');
+            } else {
+                moreInfoCard.classList.add('green');
+            }
+        }
+
         function generateDCRData() {
             const startDate = new Date('2025-07-01');
             const endDate = new Date('2026-01-22');
@@ -2551,14 +3112,16 @@
                 const productAreas = featureAreas[product];
                 const duplicationScore = Math.floor(Math.random() * 100);
                 
+                const description = descriptions[Math.floor(Math.random() * descriptions.length)];
                 dcrData.push({
                     id: 'DCR-' + String(1000 + i).padStart(4, '0'),
+                    title: description,
                     product: product,
                     productArea: productAreas[Math.floor(Math.random() * productAreas.length)],
                     createdDate: generateRandomDate(startDate, endDate),
                     requester: requesters[Math.floor(Math.random() * requesters.length)],
                     customer: customers[Math.floor(Math.random() * customers.length)],
-                    description: descriptions[Math.floor(Math.random() * descriptions.length)],
+                    description: description,
                     priority: priorities[Math.floor(Math.random() * priorities.length)],
                     duplicationScore: duplicationScore,
                     frExists: Math.random() > 0.5 ? 'Yes' : 'No',
@@ -2569,10 +3132,44 @@
                     submittedProductGroup: null,
                     submittedFeatureArea: null,
                     submittedDate: null,
+                    adoId: null,
+                    adoStatus: null,
+                    pgRequestMoreInfo: false,
+                    pgInfoRequested: null,
                     similarCustomers: generateSimilarCustomers(),
                     matchingFeatures: []
                 });
             }
+            
+            // Add a test DCR with PG requesting more info
+            const testProduct = 'Defender for Identity';
+            const testProductAreas = featureAreas[testProduct];
+            dcrData.push({
+                id: 'DCR-1099',
+                title: 'Enhanced multi-factor authentication enforcement across hybrid identity scenarios',
+                product: testProduct,
+                productArea: testProductAreas[0],
+                createdDate: new Date('2025-12-15'),
+                requester: 'Sarah Johnson',
+                customer: 'Contoso Ltd',
+                description: 'Enhanced multi-factor authentication enforcement across hybrid identity scenarios',
+                priority: 'P1',
+                duplicationScore: 65,
+                frExists: 'Yes',
+                source: 'CSS',
+                useCase: 'Enable security teams to enforce MFA policies consistently across on-premises and cloud environments',
+                customerImpact: 'Critical security gap allowing potential unauthorized access to sensitive resources',
+                submittedToPG: false,
+                submittedProductGroup: 'Microsoft ' + testProduct,
+                submittedFeatureArea: testProductAreas[0],
+                submittedDate: new Date('2026-01-20'),
+                adoId: generateAdoId(),
+                adoStatus: 'Request More Info',
+                pgRequestMoreInfo: true,
+                pgInfoRequested: 'Please provide more details about the specific authentication protocols that need to be supported and any existing third-party MFA solutions that require integration. Also, clarify the expected timeline for deployment and any compliance requirements (e.g., NIST, FedRAMP) that must be met.',
+                similarCustomers: ['Fabrikam Inc', 'Woodgrove Bank', 'Litware Inc'],
+                matchingFeatures: []
+            });
             
             // Assign matching features based on product
             dcrData.forEach(function(dcr) {
@@ -2611,15 +3208,27 @@
             
             // Filter out items that have been triaged (have triageOutcome or messagesSent)
             const mainItems = dcrData.filter(function(dcr) {
-                return !dcr.triageOutcome && !(dcr.messagesSent && dcr.messagesSent > 0);
+                return (!dcr.triageOutcome && !(dcr.messagesSent && dcr.messagesSent > 0)) || dcr.pgRequestMoreInfo;
             });
             
             mainItems.forEach(function(dcr) {
                 const row = document.createElement('tr');
                 row.className = 'clickable';
                 
+                // Highlight rows where PG needs more info
+                if (dcr.pgRequestMoreInfo) {
+                    row.style.backgroundColor = '#fef2f2';
+                    row.style.borderLeft = '4px solid #dc2626';
+                }
+                
+                row.onclick = function() {
+                    showDetailView(dcr.id);
+                };
+                
                 let submitCell = '';
-                if (dcr.submittedToPG) {
+                if (dcr.pgRequestMoreInfo) {
+                    submitCell = '<span class="priority p0" style="background:#fee2e2; color:#dc2626; font-weight:600; cursor:pointer;" onclick="event.stopPropagation(); showDetailView(\'' + dcr.id + '\')">⚠️ PG Needs Info - Click to Respond</span>';
+                } else if (dcr.submittedToPG) {
                     submitCell = '<span class="submitted-indicator"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Submitted</span>';
                 } else {
                     submitCell = '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openSubmitModal(\'' + dcr.id + '\')">Submit to PG</button>';
@@ -2629,17 +3238,17 @@
                 const duplicationCell = '<span class="duplication-badge ' + dupClass + '">' + dcr.duplicationScore + '%</span>';
                 
                 let dcrStatus = 'Require Triage';
-                let statusBadgeClass = 'priority low';
-                
+                let statusBadgeClass = 'priority p2';
+
                 if (dcr.submittedToPG) {
                     dcrStatus = 'Submitted for PG review';
-                    statusBadgeClass = 'priority medium';
+                    statusBadgeClass = 'priority p1';
                 } else if (dcr.messagesSent && dcr.messagesSent > 0) {
                     dcrStatus = 'Pending more info';
-                    statusBadgeClass = 'priority high';
+                    statusBadgeClass = 'priority p0';
                 } else if (dcr.triageOutcome) {
                     dcrStatus = 'Triage completed';
-                    statusBadgeClass = 'priority medium';
+                    statusBadgeClass = 'priority p1';
                 }
                 
                 const dcrStatusCell = '<span class="' + statusBadgeClass + '">' + dcrStatus + '</span>';
@@ -2661,6 +3270,7 @@
             });
 
             document.getElementById('queueCount').textContent = mainItems.length;
+            updateMetrics();
             renderTriagedTable();
         }
 
@@ -2689,17 +3299,37 @@
                 const row = document.createElement('tr');
                 
                 let dcrStatus = 'Require Triage';
-                let statusBadgeClass = 'priority low';
-                
+                let statusBadgeClass = 'priority p2';
+
                 if (dcr.messagesSent && dcr.messagesSent > 0) {
                     dcrStatus = 'Pending more info';
-                    statusBadgeClass = 'priority high';
+                    statusBadgeClass = 'priority p0';
                 } else if (dcr.triageOutcome) {
                     dcrStatus = 'Triage completed';
-                    statusBadgeClass = 'priority medium';
+                    statusBadgeClass = 'priority p1';
                 }
                 
                 const dcrStatusCell = '<span class="' + statusBadgeClass + '">' + dcrStatus + '</span>';
+                
+                // Get the decision outcome with styling
+                let decisionText = dcr.triageOutcome || 'No Decision';
+                let decisionBadgeClass = 'decision-badge';
+                
+                if (dcr.triageOutcome === 'Rejected') {
+                    decisionBadgeClass = 'decision-badge rejected';
+                } else if (dcr.triageOutcome === 'Feature Already Available') {
+                    decisionBadgeClass = 'decision-badge available';
+                } else if (dcr.triageOutcome === 'Request More Info') {
+                    decisionBadgeClass = 'decision-badge request-info';
+                } else if (dcr.triageOutcome === 'In Development') {
+                    decisionBadgeClass = 'decision-badge in-dev';
+                } else if (dcr.triageOutcome === 'Backlog') {
+                    decisionBadgeClass = 'decision-badge backlog';
+                } else if (dcr.triageOutcome === 'Evidence Gathering') {
+                    decisionBadgeClass = 'decision-badge gathering';
+                }
+                
+                const decisionCell = '<span class="' + decisionBadgeClass + '">' + decisionText + '</span>';
                 
                 row.innerHTML = '<td><span class="dcr-id" onclick="showDetailView(\'' + dcr.id + '\')">' + dcr.id + '</span></td>' +
                     '<td>' + dcr.product + '</td>' +
@@ -2709,6 +3339,7 @@
                     '<td>' + dcr.customer + '</td>' +
                     '<td class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
                     '<td><span class="priority ' + dcr.priority.toLowerCase() + '">' + dcr.priority + '</span></td>' +
+                    '<td>' + decisionCell + '</td>' +
                     '<td>' + dcrStatusCell + '</td>' +
                     '<td><button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); openRevertTriageModal(\'' + dcr.id + '\')">Revert</button></td>';
                 tbody.appendChild(row);
@@ -2751,6 +3382,7 @@
                     '<td><button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openAddMoreInfoModal(\'' + dcr.id + '\')">Add Info</button></td>';
                 tbody.appendChild(row);
             });
+            updateMetrics();
         }
 
         function renderPendingTable() {
@@ -2779,9 +3411,11 @@
                     '<td>' + dcr.submittedFeatureArea + '</td>' +
                     '<td>' + formatDate(dcr.submittedDate) + '</td>' +
                     '<td>' + getDaysSinceCreatedBadge(dcr.createdDate) + '</td>' +
-                    '<td><span class="priority medium">Pending Response</span></td>';
+                    '<td><span class="priority p1">Pending Response</span></td>' +
+                    '<td><button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); showAdoItemView(\'' + dcr.id + '\')">View ADO Item</button></td>';
                 tbody.appendChild(row);
             });
+            updateMetrics();
         }
 
         function showDetailView(dcrId) {
@@ -2809,13 +3443,50 @@
             priorityBadge.className = 'priority ' + dcr.priority.toLowerCase();
             
             const statusMessage = document.getElementById('detailStatusMessage');
-            if (dcr.submittedToPG) {
+            if (dcr.pgRequestMoreInfo) {
+                statusMessage.className = 'status-message error';
+                statusMessage.onclick = function() { 
+                    console.log('Status message clicked');
+                    openRespondToPgModal(); 
+                };
+                const pgInfoHtml = '<div style="margin-bottom:12px;"><strong style="font-size:15px;">⚠️ PG Needs More Information</strong></div>' +
+                    '<div style="background:#fff; padding:12px; border-radius:6px; color:#374151; margin-bottom:12px; border-left:3px solid #dc2626;">' +
+                    '<strong>Information Requested:</strong><br>' + dcr.pgInfoRequested + '</div>' +
+                    '<div style="font-size:13px; color:#991b1b; margin-bottom:12px;">Click the button below to provide the requested information.</div>';
+                
+                // Clear and rebuild the status text area
+                const statusTextDiv = document.getElementById('detailStatusText');
+                statusTextDiv.innerHTML = pgInfoHtml;
+                
+                // Create and append button directly instead of trying to add via innerHTML
+                const responseBtn = document.createElement('button');
+                responseBtn.className = 'btn btn-primary';
+                responseBtn.style.marginTop = '12px';
+                responseBtn.textContent = 'Provide Information & Resubmit';
+                responseBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    console.log('Response button clicked');
+                    openRespondToPgModal();
+                };
+                statusTextDiv.appendChild(responseBtn);
+                
+                document.getElementById('submitToPGBtn').style.display = 'none';
+                document.getElementById('revertSubmissionBtn').style.display = 'none';
+            } else if (dcr.submittedToPG) {
+                if (!dcr.adoId) {
+                    dcr.adoId = generateAdoId();
+                }
+                if (!dcr.adoStatus) {
+                    dcr.adoStatus = 'Pending Review';
+                }
                 statusMessage.className = 'status-message success';
-                document.getElementById('detailStatusText').textContent = 'Submitted to ' + dcr.submittedProductGroup + ' - ' + dcr.submittedFeatureArea + ' on ' + formatDate(dcr.submittedDate);
+                const linkHtml = getAdoLinkHtml(dcr.id);
+                document.getElementById('detailStatusText').innerHTML = 'Submitted to ' + dcr.submittedProductGroup + ' - ' + dcr.submittedFeatureArea + ' on ' + formatDate(dcr.submittedDate) + '&nbsp;&bull;&nbsp;' + linkHtml;
                 document.getElementById('submitToPGBtn').style.display = 'none';
                 document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
             } else {
                 statusMessage.className = 'status-message';
+                document.getElementById('detailStatusText').innerHTML = '';
                 document.getElementById('submitToPGBtn').style.display = 'inline-flex';
                 document.getElementById('revertSubmissionBtn').style.display = 'none';
             }
@@ -2994,6 +3665,10 @@
                 dcr.submittedProductGroup = productGroup;
                 dcr.submittedFeatureArea = featureArea;
                 dcr.submittedDate = new Date();
+                if (!dcr.adoId) {
+                    dcr.adoId = generateAdoId();
+                }
+                dcr.adoStatus = 'Pending Review';
             }
             
             closeModal();
@@ -3002,11 +3677,14 @@
             renderTriagedTable();
             renderPendingMoreInfoTable();
             renderPendingTable();
+            updatePgBadgeCount();
+            renderPgTable();
             
             if (currentDcr && currentDcr.id === modalDcr.id) {
                 const statusMessage = document.getElementById('detailStatusMessage');
                 statusMessage.className = 'status-message success';
-                document.getElementById('detailStatusText').textContent = 'Submitted to ' + productGroup + ' - ' + featureArea + ' on ' + formatDate(new Date());
+                const linkHtml = getAdoLinkHtml(currentDcr.id);
+                document.getElementById('detailStatusText').innerHTML = 'Submitted to ' + productGroup + ' - ' + featureArea + ' on ' + formatDate(new Date()) + '&nbsp;&bull;&nbsp;' + linkHtml;
                 document.getElementById('submitToPGBtn').style.display = 'none';
                 document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
             }
@@ -3021,10 +3699,18 @@
                 dcr.submittedProductGroup = null;
                 dcr.submittedFeatureArea = null;
                 dcr.submittedDate = null;
+                dcr.adoId = null;
+                dcr.adoStatus = null;
+                dcr.pgTriageOutcome = null;
+                dcr.pgRequestMoreInfo = false;
+                dcr.pgInfoRequested = null;
                 
                 // Update the detail view
                 const statusMessage = document.getElementById('detailStatusMessage');
                 statusMessage.className = 'status-message';
+                statusMessage.style.background = '';
+                statusMessage.style.color = '';
+                statusMessage.style.borderLeft = '';
                 document.getElementById('detailStatusText').textContent = '';
                 document.getElementById('submitToPGBtn').style.display = 'inline-flex';
                 document.getElementById('revertSubmissionBtn').style.display = 'none';
@@ -3034,6 +3720,8 @@
                 renderTriagedTable();
                 renderPendingMoreInfoTable();
                 renderPendingTable();
+                updatePgBadgeCount();
+                renderPgTable();
             }
         }
 
@@ -3090,6 +3778,8 @@
         let isCreatingNewFeature = false;
         let currentView = 'cxe';
         let currentPgDcr = null;
+        let currentAdoDcr = null;
+        let adoBackView = 'cxe';
 
         // Feature Already Available Modal functions
         function openFeatureAvailableModal() {
@@ -3630,10 +4320,12 @@
             const pgTriageView = document.getElementById('pgTriageView');
             const detailView = document.getElementById('detailView');
             const pgDetailView = document.getElementById('pgDetailView');
+            const adoItemView = document.getElementById('adoItemView');
             
             // Hide all detail views
             detailView.classList.remove('active');
             pgDetailView.classList.remove('active');
+            adoItemView.classList.remove('active');
             
             if (view === 'cxe') {
                 cxeBtn.classList.add('active');
@@ -3688,6 +4380,8 @@
                     statusBadge = '<span class="pg-status-badge rejected">Rejected</span>';
                 } else if (dcr.pgTriageOutcome === 'Approved') {
                     statusBadge = '<span class="pg-status-badge approved">Approved</span>';
+                } else if (dcr.pgTriageOutcome === 'More Info') {
+                    statusBadge = '<span class="pg-status-badge more-info">Need More Info</span>';
                 } else if (dcr.pgTriageOutcome === 'Backlog') {
                     statusBadge = '<span class="pg-status-badge backlog">Added to Backlog</span>';
                 }
@@ -3707,11 +4401,506 @@
             });
         }
 
+        function getAdoStatusFromPgOutcome(pgOutcome) {
+            if (pgOutcome === 'Approved') return 'Approved';
+            if (pgOutcome === 'Rejected') return 'Rejected';
+            if (pgOutcome === 'Backlog') return 'Added to Backlog';
+            if (pgOutcome === 'More Info') return 'Need More Info';
+            return 'Pending Review';
+        }
+
+        function updatePgDetailStatusMessage(dcr) {
+            const statusMessage = document.getElementById('pgDetailStatusMessage');
+            if (!statusMessage) return;
+
+            if (dcr.pgTriageOutcome) {
+                statusMessage.className = 'status-message success';
+                statusMessage.style.background = '#f3f4f6';
+                statusMessage.style.color = '#374151';
+
+                if (dcr.pgTriageOutcome === 'Rejected') {
+                    statusMessage.style.background = '#fee2e2';
+                    statusMessage.style.color = '#dc2626';
+                    const reasonText = dcr.pgRejectionReason ? ' (' + dcr.pgRejectionReason + ')' : '';
+                    document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Rejected' + reasonText + ' on ' + formatDate(dcr.pgTriageDate || new Date());
+                    return;
+                }
+
+                if (dcr.pgTriageOutcome === 'Approved') {
+                    statusMessage.style.background = '#d1fae5';
+                    statusMessage.style.color = '#059669';
+                    if (dcr.pgFeatureStatus && dcr.pgApprovalLink) {
+                        const linkHtml = '<a href="' + dcr.pgApprovalLink + '" target="_blank" rel="noopener" style="color:#059669; text-decoration:underline;">View</a>';
+                        document.getElementById('pgDetailStatusText').innerHTML = 'PG Decision: Approved - ' + dcr.pgFeatureStatus + ' on ' + formatDate(dcr.pgTriageDate || new Date()) + ' (' + linkHtml + ')';
+                    } else {
+                        document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Approved on ' + formatDate(dcr.pgTriageDate || new Date());
+                    }
+                    return;
+                }
+
+                if (dcr.pgTriageOutcome === 'Backlog') {
+                    statusMessage.style.background = '#dbeafe';
+                    statusMessage.style.color = '#2563eb';
+                    document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Added to Backlog on ' + formatDate(dcr.pgTriageDate || new Date());
+                    return;
+                }
+
+                if (dcr.pgTriageOutcome === 'More Info') {
+                    statusMessage.style.background = '#fef3c7';
+                    statusMessage.style.color = '#d97706';
+                    document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Need More Info on ' + formatDate(dcr.pgTriageDate || new Date());
+                    return;
+                }
+            }
+
+            statusMessage.className = 'status-message';
+            document.getElementById('pgDetailStatusText').textContent = '';
+        }
+
+        function showAdoItemView(dcrId) {
+            const dcr = dcrData.find(function(d) { return d.id === dcrId; });
+            if (!dcr || !dcr.submittedToPG) return;
+
+            if (!dcr.adoId) {
+                dcr.adoId = generateAdoId();
+            }
+            if (!dcr.adoStatus) {
+                dcr.adoStatus = getAdoStatusFromPgOutcome(dcr.pgTriageOutcome);
+            }
+
+            currentAdoDcr = dcr;
+
+            if (document.getElementById('detailView').classList.contains('active')) {
+                adoBackView = 'detail';
+            } else if (document.getElementById('pgDetailView').classList.contains('active')) {
+                adoBackView = 'pgDetail';
+            } else if (document.getElementById('pgTriageView').classList.contains('active')) {
+                adoBackView = 'pg';
+            } else {
+                adoBackView = 'cxe';
+            }
+
+            document.getElementById('adoScenarioId').textContent = 'Scenario ' + dcr.adoId;
+            document.getElementById('adoBreadcrumb').textContent = 'Scenario ' + dcr.adoId;
+            document.getElementById('adoTitle').textContent = dcr.title || dcr.description;
+            document.getElementById('adoCreatedDate').textContent = 'Created: ' + formatDate(dcr.submittedDate || dcr.createdDate);
+            document.getElementById('adoAreaPath').textContent = 'Area: ' + (dcr.submittedProductGroup || dcr.product);
+            document.getElementById('adoIteration').textContent = 'Iteration: ' + 'Q1 2026';
+
+            document.getElementById('adoDcrId').textContent = dcr.id;
+            document.getElementById('adoProduct').textContent = dcr.product;
+            document.getElementById('adoFeatureArea').textContent = dcr.submittedFeatureArea || dcr.productArea;
+            document.getElementById('adoPriority').textContent = dcr.priority;
+            document.getElementById('adoRequester').textContent = dcr.requester;
+            document.getElementById('adoCustomer').textContent = dcr.customer;
+            document.getElementById('adoSource').textContent = dcr.source;
+            document.getElementById('adoProductGroup').textContent = dcr.submittedProductGroup || '-';
+            document.getElementById('adoSubmittedDate').textContent = dcr.submittedDate ? formatDate(dcr.submittedDate) : '-';
+
+            const descriptionLines = [
+                'Use Case: ' + dcr.useCase,
+                'Customer Impact: ' + dcr.customerImpact,
+                'Description: ' + dcr.description,
+                'Requester: ' + dcr.requester,
+                'Customer: ' + dcr.customer
+            ];
+            document.getElementById('adoDescription').textContent = descriptionLines.join('\n\n');
+
+            // Update status badge
+            const statusBadge = document.getElementById('adoStatusBadge');
+            const actionsSection = document.getElementById('adoActionsSection');
+            
+            if (dcr.adoStatus === 'Pending Review') {
+                statusBadge.className = 'pg-status-badge pending';
+                statusBadge.textContent = 'Pending Review';
+                statusBadge.style.fontSize = '14px';
+                statusBadge.style.padding = '8px 16px';
+                actionsSection.style.display = 'block';
+            } else {
+                actionsSection.style.display = 'none';
+                statusBadge.style.fontSize = '14px';
+                statusBadge.style.padding = '8px 16px';
+                
+                if (dcr.adoStatus === 'Rejected') {
+                    statusBadge.className = 'pg-status-badge rejected';
+                    statusBadge.textContent = 'Rejected';
+                } else if (dcr.adoStatus === 'Request More Info') {
+                    statusBadge.className = 'pg-status-badge more-info';
+                    statusBadge.textContent = 'Request More Info';
+                } else if (dcr.adoStatus === 'Generally Available') {
+                    statusBadge.className = 'pg-status-badge approved';
+                    statusBadge.textContent = 'Generally Available';
+                } else if (dcr.adoStatus === 'In Development' || dcr.adoStatus === 'Private Preview' || dcr.adoStatus === 'Public Preview') {
+                    statusBadge.className = 'pg-status-badge backlog';
+                    statusBadge.textContent = dcr.adoStatus;
+                } else if (dcr.adoStatus === 'Added to Backlog') {
+                    statusBadge.className = 'pg-status-badge backlog';
+                    statusBadge.textContent = 'Added to Backlog';
+                }
+            }
+
+            document.getElementById('mainView').classList.add('hidden');
+            document.getElementById('detailView').classList.remove('active');
+            document.getElementById('pgTriageView').classList.remove('active');
+            document.getElementById('pgDetailView').classList.remove('active');
+            document.getElementById('adoItemView').classList.add('active');
+        }
+
+        function showAdoBackView() {
+            document.getElementById('adoItemView').classList.remove('active');
+
+            if (adoBackView === 'detail') {
+                document.getElementById('detailView').classList.add('active');
+                document.getElementById('mainView').classList.add('hidden');
+            } else if (adoBackView === 'pgDetail') {
+                document.getElementById('pgDetailView').classList.add('active');
+            } else if (adoBackView === 'pg') {
+                document.getElementById('pgTriageView').classList.add('active');
+            } else {
+                document.getElementById('mainView').classList.remove('hidden');
+            }
+        }
+
+        function onAdoStatusChange() {
+            if (!currentAdoDcr) return;
+            const status = document.getElementById('adoStatusSelect').value;
+            currentAdoDcr.adoStatus = status;
+
+            if (status === 'Approved') {
+                currentAdoDcr.pgTriageOutcome = 'Approved';
+            } else if (status === 'Rejected') {
+                currentAdoDcr.pgTriageOutcome = 'Rejected';
+            } else if (status === 'Added to Backlog') {
+                currentAdoDcr.pgTriageOutcome = 'Backlog';
+            } else if (status === 'Need More Info') {
+                currentAdoDcr.pgTriageOutcome = 'More Info';
+            } else {
+                currentAdoDcr.pgTriageOutcome = null;
+            }
+
+            currentAdoDcr.pgTriageDate = new Date();
+            updatePgBadgeCount();
+            renderPgTable();
+
+            if (currentPgDcr && currentPgDcr.id === currentAdoDcr.id) {
+                updatePgDetailStatusMessage(currentPgDcr);
+            }
+        }
+
+        // ADO Modal Functions
+        function openAdoRejectedModal() {
+            if (!currentAdoDcr) return;
+            document.getElementById('adoRejectionReason').value = '';
+            document.getElementById('adoRejectionNotes').value = '';
+            document.getElementById('adoRejectedModal').classList.add('active');
+        }
+
+        function closeAdoRejectedModal() {
+            document.getElementById('adoRejectedModal').classList.remove('active');
+        }
+
+        function submitAdoRejected() {
+            const reason = document.getElementById('adoRejectionReason').value;
+            const notes = document.getElementById('adoRejectionNotes').value;
+            
+            if (!reason) {
+                alert('Please select a rejection reason.');
+                return;
+            }
+            
+            if (!notes.trim()) {
+                alert('Please provide rejection notes.');
+                return;
+            }
+            
+            if (currentAdoDcr) {
+                currentAdoDcr.adoStatus = 'Rejected';
+                currentAdoDcr.pgTriageOutcome = 'Rejected';
+                currentAdoDcr.pgRejectionReason = reason;
+                currentAdoDcr.pgRejectionNotes = notes;
+                currentAdoDcr.pgTriageDate = new Date();
+                currentAdoDcr.triageOutcome = 'Rejected';
+                currentAdoDcr.submittedToPG = false;
+                currentAdoDcr.pgRequestMoreInfo = false;
+                
+                alert('DCR ' + currentAdoDcr.id + ' has been rejected.');
+            }
+            
+            closeAdoRejectedModal();
+            refreshAllViews();
+            showAdoBackView();
+        }
+
+        function openAdoRequestInfoModal() {
+            if (!currentAdoDcr) return;
+            document.getElementById('adoInfoRequested').value = '';
+            document.getElementById('adoRequestInfoModal').classList.add('active');
+        }
+
+        function closeAdoRequestInfoModal() {
+            document.getElementById('adoRequestInfoModal').classList.remove('active');
+        }
+
+        function submitAdoRequestInfo() {
+            const infoRequested = document.getElementById('adoInfoRequested').value;
+            
+            if (!infoRequested.trim()) {
+                alert('Please specify what information is needed.');
+                return;
+            }
+            
+            if (currentAdoDcr) {
+                currentAdoDcr.adoStatus = 'Request More Info';
+                currentAdoDcr.pgRequestMoreInfo = true;
+                currentAdoDcr.pgInfoRequested = infoRequested;
+                currentAdoDcr.submittedToPG = false;
+                
+                alert('Information request sent to CxE for ' + currentAdoDcr.id);
+            }
+            
+            closeAdoRequestInfoModal();
+            refreshAllViews();
+            showAdoBackView();
+        }
+
+        function openAdoAvailableModal() {
+            if (!currentAdoDcr) return;
+            document.getElementById('adoDocumentationLink').value = '';
+            document.getElementById('adoAvailableNotes').value = '';
+            document.getElementById('adoAvailableModal').classList.add('active');
+        }
+
+        function closeAdoAvailableModal() {
+            document.getElementById('adoAvailableModal').classList.remove('active');
+        }
+
+        function submitAdoAvailable() {
+            const link = document.getElementById('adoDocumentationLink').value;
+            const notes = document.getElementById('adoAvailableNotes').value;
+            
+            if (!link.trim()) {
+                alert('Please provide a link to the documentation.');
+                return;
+            }
+            
+            if (currentAdoDcr) {
+                currentAdoDcr.adoStatus = 'Generally Available';
+                currentAdoDcr.pgTriageOutcome = 'Approved';
+                currentAdoDcr.pgFeatureStatus = 'Generally Available';
+                currentAdoDcr.pgApprovalLink = link;
+                currentAdoDcr.pgApprovalNotes = notes;
+                currentAdoDcr.pgTriageDate = new Date();
+                currentAdoDcr.triageOutcome = 'Feature Available';
+                currentAdoDcr.availabilityStatus = 'Generally Available';
+                currentAdoDcr.submittedToPG = false;
+                currentAdoDcr.pgRequestMoreInfo = false;
+                
+                alert('DCR ' + currentAdoDcr.id + ' marked as Generally Available.');
+            }
+            
+            closeAdoAvailableModal();
+            refreshAllViews();
+            showAdoBackView();
+        }
+
+        function openAdoInDevModal() {
+            if (!currentAdoDcr) return;
+            document.getElementById('adoDevPhase').value = '';
+            document.getElementById('adoDevLink').value = '';
+            document.getElementById('adoDevNotes').value = '';
+            document.getElementById('adoInDevModal').classList.add('active');
+        }
+
+        function closeAdoInDevModal() {
+            document.getElementById('adoInDevModal').classList.remove('active');
+        }
+
+        function submitAdoInDev() {
+            const phase = document.getElementById('adoDevPhase').value;
+            const link = document.getElementById('adoDevLink').value;
+            const notes = document.getElementById('adoDevNotes').value;
+            
+            if (!phase) {
+                alert('Please select a development phase.');
+                return;
+            }
+            
+            if (!link.trim()) {
+                alert('Please provide an ADO item link.');
+                return;
+            }
+            
+            if (currentAdoDcr) {
+                currentAdoDcr.adoStatus = phase;
+                currentAdoDcr.pgTriageOutcome = 'Approved';
+                currentAdoDcr.pgFeatureStatus = phase;
+                currentAdoDcr.pgApprovalLink = link;
+                currentAdoDcr.pgApprovalNotes = notes;
+                currentAdoDcr.pgTriageDate = new Date();
+                currentAdoDcr.triageOutcome = 'Evidence Gathering';
+                currentAdoDcr.submittedToPG = false;
+                currentAdoDcr.pgRequestMoreInfo = false;
+                
+                alert('DCR ' + currentAdoDcr.id + ' marked as ' + phase + '.');
+            }
+            
+            closeAdoInDevModal();
+            refreshAllViews();
+            showAdoBackView();
+        }
+
+        function openAdoBacklogModal() {
+            if (!currentAdoDcr) return;
+            document.getElementById('adoUseCurrentItem').checked = true;
+            document.getElementById('adoBacklogLink').value = '';
+            document.getElementById('adoBacklogNotes').value = '';
+            document.getElementById('adoBacklogLinkGroup').style.display = 'none';
+            document.getElementById('adoBacklogModal').classList.add('active');
+        }
+
+        function closeAdoBacklogModal() {
+            document.getElementById('adoBacklogModal').classList.remove('active');
+        }
+
+        function toggleAdoBacklogLink() {
+            const useCurrentItem = document.getElementById('adoUseCurrentItem').checked;
+            document.getElementById('adoBacklogLinkGroup').style.display = useCurrentItem ? 'none' : 'block';
+        }
+
+        function submitAdoBacklog() {
+            const useCurrentItem = document.getElementById('adoUseCurrentItem').checked;
+            const link = document.getElementById('adoBacklogLink').value;
+            const notes = document.getElementById('adoBacklogNotes').value;
+            
+            if (!useCurrentItem && !link.trim()) {
+                alert('Please provide an ADO item link or check "Use current ADO item".');
+                return;
+            }
+            
+            if (currentAdoDcr) {
+                currentAdoDcr.adoStatus = 'Added to Backlog';
+                currentAdoDcr.pgTriageOutcome = 'Backlog';
+                currentAdoDcr.pgBacklogLink = useCurrentItem ? currentAdoDcr.adoId : link;
+                currentAdoDcr.pgBacklogNotes = notes;
+                currentAdoDcr.pgTriageDate = new Date();
+                currentAdoDcr.triageOutcome = 'Evidence Gathering';
+                currentAdoDcr.submittedToPG = false;
+                currentAdoDcr.pgRequestMoreInfo = false;
+                
+                alert('DCR ' + currentAdoDcr.id + ' added to backlog.');
+            }
+            
+            closeAdoBacklogModal();
+            refreshAllViews();
+            showAdoBackView();
+        }
+
+        function refreshAllViews() {
+            renderMainTable();
+            renderTriagedTable();
+            renderPendingMoreInfoTable();
+            renderPendingTable();
+            updatePgBadgeCount();
+            renderPgTable();
+        }
+
+        function openRespondToPgModal() {
+            console.log('=== openRespondToPgModal called ===');
+            console.log('currentDcr:', currentDcr);
+            
+            if (!currentDcr) {
+                console.error('No currentDcr found');
+                alert('No DCR selected. Please select a DCR first.');
+                return;
+            }
+            
+            const modalElement = document.getElementById('respondToPgModal');
+            if (!modalElement) {
+                console.error('respondToPgModal element not found');
+                alert('Modal element not found in page');
+                return;
+            }
+            
+            console.log('Modal element found:', modalElement);
+            console.log('pgInfoRequested:', currentDcr.pgInfoRequested);
+            
+            // Set the requested info
+            const pgInfoElement = document.getElementById('pgRequestedInfo');
+            if (pgInfoElement) {
+                pgInfoElement.textContent = currentDcr.pgInfoRequested || 'No specific information requested.';
+                console.log('Set pgRequestedInfo to:', pgInfoElement.textContent);
+            } else {
+                console.error('pgRequestedInfo element not found');
+            }
+            
+            // Clear the response textarea
+            const responseTextarea = document.getElementById('cxeResponseInfo');
+            if (responseTextarea) {
+                responseTextarea.value = '';
+                console.log('Cleared cxeResponseInfo');
+            } else {
+                console.error('cxeResponseInfo element not found');
+            }
+            
+            // Add active class
+            modalElement.classList.add('active');
+            console.log('Added active class to modal');
+            console.log('Modal display:', window.getComputedStyle(modalElement).display);
+            console.log('Modal visibility:', window.getComputedStyle(modalElement).visibility);
+            console.log('Modal opacity:', window.getComputedStyle(modalElement).opacity);
+            console.log('=== Modal should be visible now ===');
+        }
+
+        function closeRespondToPgModal() {
+            document.getElementById('respondToPgModal').classList.remove('active');
+        }
+
+        function submitRespondToPg() {
+            const response = document.getElementById('cxeResponseInfo').value;
+            
+            if (!response.trim()) {
+                alert('Please provide a response.');
+                return;
+            }
+            
+            if (currentDcr) {
+                currentDcr.pgResponseInfo = response;
+                currentDcr.pgRequestMoreInfo = false;
+                currentDcr.submittedToPG = true;
+                currentDcr.submittedDate = new Date();
+                currentDcr.adoStatus = 'Pending Review';
+                
+                const statusMessage = document.getElementById('detailStatusMessage');
+                statusMessage.className = 'status-message success';
+                statusMessage.style.background = '#d1fae5';
+                statusMessage.style.color = '#059669';
+                statusMessage.style.borderLeft = '4px solid #059669';
+                statusMessage.style.cursor = 'default';
+                statusMessage.onclick = null;
+                const linkHtml = getAdoLinkHtml(currentDcr.id);
+                document.getElementById('detailStatusText').innerHTML = '<strong>✓ Information Provided & Resubmitted</strong><br>' +
+                    'Resubmitted to ' + currentDcr.submittedProductGroup + ' - ' + currentDcr.submittedFeatureArea + ' on ' + formatDate(new Date()) + '<br>' + linkHtml;
+                document.getElementById('submitToPGBtn').style.display = 'none';
+                document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
+                
+                alert('✓ Additional information provided and DCR resubmitted to PG for ' + currentDcr.id);
+            }
+            
+            closeRespondToPgModal();
+            refreshAllViews();
+        }
+
         function showPgDetailView(dcrId) {
             const dcr = dcrData.find(function(d) { return d.id === dcrId; });
             if (!dcr) return;
             
             currentPgDcr = dcr;
+            if (!dcr.adoId) {
+                dcr.adoId = generateAdoId();
+            }
+            if (!dcr.adoStatus) {
+                dcr.adoStatus = getAdoStatusFromPgOutcome(dcr.pgTriageOutcome);
+            }
             
             document.getElementById('pgDetailBreadcrumb').textContent = dcr.id;
             document.getElementById('pgDetailTitle').textContent = dcr.id + ' - ' + dcr.product;
@@ -3768,17 +4957,7 @@
             document.getElementById('estimateDependencies').textContent = dependencies[Math.floor(Math.random() * 4)];
             
             // Status message
-            const statusMessage = document.getElementById('pgDetailStatusMessage');
-            if (dcr.pgTriageOutcome) {
-                statusMessage.className = 'status-message success';
-                if (dcr.pgTriageOutcome === 'Rejected') {
-                    statusMessage.style.background = '#fee2e2';
-                    statusMessage.style.color = '#dc2626';
-                }
-                document.getElementById('pgDetailStatusText').textContent = 'PG Decision: ' + dcr.pgTriageOutcome + ' on ' + formatDate(dcr.pgTriageDate);
-            } else {
-                statusMessage.className = 'status-message';
-            }
+            updatePgDetailStatusMessage(dcr);
             
             document.getElementById('pgTriageView').classList.remove('active');
             document.getElementById('pgDetailView').classList.add('active');
@@ -3822,16 +5001,14 @@
                 currentPgDcr.pgRejectionReason = reason;
                 currentPgDcr.pgRejectionNotes = notes;
                 currentPgDcr.pgTriageDate = new Date();
+                currentPgDcr.adoStatus = 'Rejected';
                 
-                const statusMessage = document.getElementById('pgDetailStatusMessage');
-                statusMessage.className = 'status-message success';
-                statusMessage.style.background = '#fee2e2';
-                statusMessage.style.color = '#dc2626';
-                document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Rejected (' + reason + ') on ' + formatDate(new Date());
+                updatePgDetailStatusMessage(currentPgDcr);
             }
             
             closePgRejectedModal();
             updatePgBadgeCount();
+            renderPgTable();
         }
 
         // PG approval flow
@@ -3881,6 +5058,7 @@
             currentPgDcr.pgFeatureStatus = status;
             currentPgDcr.pgApprovalLink = link;
             currentPgDcr.pgTriageDate = new Date();
+            currentPgDcr.adoStatus = 'Approved';
 
             const statusMessage = document.getElementById('pgDetailStatusMessage');
             statusMessage.className = 'status-message success';
@@ -3889,6 +5067,10 @@
 
             const linkHtml = '<a href="' + link + '" target="_blank" rel="noopener" style="color:#059669; text-decoration:underline;">View</a>';
             document.getElementById('pgDetailStatusText').innerHTML = 'PG Decision: Approved - ' + status + ' on ' + formatDate(currentPgDcr.pgTriageDate) + ' (' + linkHtml + ')';
+
+            if (currentAdoDcr && currentAdoDcr.id === currentPgDcr.id) {
+                document.getElementById('adoStatusSelect').value = 'Approved';
+            }
 
             closePgApprovedModal();
             updatePgBadgeCount();
@@ -3899,17 +5081,22 @@
             if (!currentPgDcr) return;
             currentPgDcr.pgTriageOutcome = 'Backlog';
             currentPgDcr.pgTriageDate = new Date();
+            currentPgDcr.adoStatus = 'Added to Backlog';
             
-            const statusMessage = document.getElementById('pgDetailStatusMessage');
-            statusMessage.className = 'status-message success';
-            statusMessage.style.background = '#dbeafe';
-            statusMessage.style.color = '#2563eb';
-            document.getElementById('pgDetailStatusText').textContent = 'PG Decision: Added to Backlog on ' + formatDate(new Date());
+            updatePgDetailStatusMessage(currentPgDcr);
             updatePgBadgeCount();
+            renderPgTable();
         }
 
         function openPgMoreInfoModal() {
             if (!currentPgDcr) return;
+            currentPgDcr.pgTriageOutcome = 'More Info';
+            currentPgDcr.pgTriageDate = new Date();
+            currentPgDcr.adoStatus = 'Need More Info';
+
+            updatePgDetailStatusMessage(currentPgDcr);
+            updatePgBadgeCount();
+            renderPgTable();
             alert('Request for more information sent to CxE team for ' + currentPgDcr.id);
         }
     </script>

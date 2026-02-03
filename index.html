@@ -653,6 +653,31 @@
             color: #dc2626;
         }
 
+        .health-index {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .health-index.health-low {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .health-index.health-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .health-index.health-high {
+            background: #d1fae5;
+            color: #059669;
+        }
+
         .btn {
             padding: 8px 16px;
             border-radius: 6px;
@@ -1681,6 +1706,7 @@
                                     <th>Days Since Created</th>
                                     <th>Requester</th>
                                     <th>Customer Name</th>
+                                    <th>Health Index</th>
                                     <th>Description</th>
                                     <th>Priority</th>
                                     <th>Duplication Score</th>
@@ -2166,6 +2192,7 @@
                         <div class="ado-field"><span>Priority</span><div id="adoPriority">-</div></div>
                         <div class="ado-field"><span>Requester</span><div id="adoRequester">-</div></div>
                         <div class="ado-field"><span>Customer</span><div id="adoCustomer">-</div></div>
+                        <div class="ado-field"><span>Health Index</span><div id="adoHealthIndex">-</div></div>
                         <div class="ado-field"><span>Source</span><div id="adoSource">-</div></div>
                         <div class="ado-field"><span>Product Group</span><div id="adoProductGroup">-</div></div>
                         <div class="ado-field"><span>Submitted Date</span><div id="adoSubmittedDate">-</div></div>
@@ -2451,6 +2478,10 @@
                         <div class="detail-section">
                             <h4>Customer</h4>
                             <p id="detailCustomer">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Health Index</h4>
+                            <p id="detailHealthIndex">-</p>
                         </div>
                         <div class="detail-section">
                             <h4>Created Date</h4>
@@ -3137,7 +3168,8 @@
                     pgRequestMoreInfo: false,
                     pgInfoRequested: null,
                     similarCustomers: generateSimilarCustomers(),
-                    matchingFeatures: []
+                    matchingFeatures: [],
+                    customerHealthIndex: Math.floor(Math.random() * 100) + 1
                 });
             }
             
@@ -3168,7 +3200,8 @@
                 pgRequestMoreInfo: true,
                 pgInfoRequested: 'Please provide more details about the specific authentication protocols that need to be supported and any existing third-party MFA solutions that require integration. Also, clarify the expected timeline for deployment and any compliance requirements (e.g., NIST, FedRAMP) that must be met.',
                 similarCustomers: ['Fabrikam Inc', 'Woodgrove Bank', 'Litware Inc'],
-                matchingFeatures: []
+                matchingFeatures: [],
+                customerHealthIndex: 72
             });
             
             // Assign matching features based on product
@@ -3253,12 +3286,16 @@
                 
                 const dcrStatusCell = '<span class="' + statusBadgeClass + '">' + dcrStatus + '</span>';
                 
+                const healthClass = dcr.customerHealthIndex <= 33 ? 'health-low' : (dcr.customerHealthIndex <= 66 ? 'health-medium' : 'health-high');
+                const healthIndexCell = '<span class="health-index ' + healthClass + '">' + dcr.customerHealthIndex + '</span>';
+                
                 row.innerHTML = '<td><span class="dcr-id" onclick="showDetailView(\'' + dcr.id + '\')">' + dcr.id + '</span></td>' +
                     '<td>' + dcr.product + '</td>' +
                     '<td>' + formatDate(dcr.createdDate) + '</td>' +
                     '<td>' + getDaysSinceCreatedBadge(dcr.createdDate) + '</td>' +
                     '<td><span class="requester-link" onclick="event.stopPropagation(); openMessageModal(\'' + dcr.id + '\')">' + dcr.requester + '</span></td>' +
                     '<td>' + dcr.customer + '</td>' +
+                    '<td>' + healthIndexCell + '</td>' +
                     '<td class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
                     '<td><span class="priority ' + dcr.priority.toLowerCase() + '">' + dcr.priority + '</span></td>' +
                     '<td>' + duplicationCell + '</td>' +
@@ -3433,6 +3470,11 @@
             document.getElementById('detailPriorityText').textContent = dcr.priority;
             document.getElementById('detailRequester').textContent = dcr.requester;
             document.getElementById('detailCustomer').textContent = dcr.customer;
+            
+            // Populate Health Index with styled badge
+            const healthClass = dcr.customerHealthIndex <= 33 ? 'health-low' : (dcr.customerHealthIndex <= 66 ? 'health-medium' : 'health-high');
+            document.getElementById('detailHealthIndex').innerHTML = '<span class="health-index ' + healthClass + '">' + dcr.customerHealthIndex + '</span>';
+            
             document.getElementById('detailCreatedDate').textContent = formatDate(dcr.createdDate);
             document.getElementById('detailUseCase').textContent = dcr.useCase;
             document.getElementById('detailCustomerImpact').textContent = dcr.customerImpact;
@@ -4493,6 +4535,11 @@
             document.getElementById('adoPriority').textContent = dcr.priority;
             document.getElementById('adoRequester').textContent = dcr.requester;
             document.getElementById('adoCustomer').textContent = dcr.customer;
+            
+            // Populate Health Index with styled badge
+            const adoHealthClass = dcr.customerHealthIndex <= 33 ? 'health-low' : (dcr.customerHealthIndex <= 66 ? 'health-medium' : 'health-high');
+            document.getElementById('adoHealthIndex').innerHTML = '<span class="health-index ' + adoHealthClass + '">' + dcr.customerHealthIndex + '</span>';
+            
             document.getElementById('adoSource').textContent = dcr.source;
             document.getElementById('adoProductGroup').textContent = dcr.submittedProductGroup || '-';
             document.getElementById('adoSubmittedDate').textContent = dcr.submittedDate ? formatDate(dcr.submittedDate) : '-';

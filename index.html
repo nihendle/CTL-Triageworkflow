@@ -485,7 +485,7 @@
         }
 
         th, td {
-            padding: 12px 16px;
+            padding: 8px 10px;
             text-align: left;
             border-bottom: 1px solid #e5e7eb;
         }
@@ -493,7 +493,7 @@
         th {
             background: #f9fafb;
             font-weight: 600;
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             color: #6b7280;
             letter-spacing: 0.05em;
@@ -508,7 +508,7 @@
         }
 
         td {
-            font-size: 14px;
+            font-size: 12px;
         }
 
         .dcr-id {
@@ -676,6 +676,26 @@
         .health-index.health-high {
             background: #d1fae5;
             color: #059669;
+        }
+
+        .is-hot-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 50px;
+            text-align: center;
+        }
+
+        .is-hot-badge.hot-none {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .is-hot-badge.hot-critical {
+            background: #fee2e2;
+            color: #dc2626;
         }
 
         .btn {
@@ -1707,6 +1727,7 @@
                                     <th>Requester</th>
                                     <th>Customer Name</th>
                                     <th>Health Index</th>
+                                    <th>Is Hot</th>
                                     <th>Description</th>
                                     <th>Priority</th>
                                     <th>Duplication Score</th>
@@ -2193,6 +2214,7 @@
                         <div class="ado-field"><span>Requester</span><div id="adoRequester">-</div></div>
                         <div class="ado-field"><span>Customer</span><div id="adoCustomer">-</div></div>
                         <div class="ado-field"><span>Health Index</span><div id="adoHealthIndex">-</div></div>
+                        <div class="ado-field"><span>Is Hot</span><div id="adoIsHot">-</div></div>
                         <div class="ado-field"><span>Source</span><div id="adoSource">-</div></div>
                         <div class="ado-field"><span>Product Group</span><div id="adoProductGroup">-</div></div>
                         <div class="ado-field"><span>Submitted Date</span><div id="adoSubmittedDate">-</div></div>
@@ -2482,6 +2504,10 @@
                         <div class="detail-section">
                             <h4>Health Index</h4>
                             <p id="detailHealthIndex">-</p>
+                        </div>
+                        <div class="detail-section">
+                            <h4>Is Hot</h4>
+                            <p id="detailIsHot">-</p>
                         </div>
                         <div class="detail-section">
                             <h4>Created Date</h4>
@@ -3074,7 +3100,7 @@
                 badgeClass = 'days-badge red';
             }
             
-            return '<span class="' + badgeClass + '">' + daysPassed + ' days</span>';
+            return '<span class="' + badgeClass + '">' + daysPassed + '</span>';
         }
 
         function updateMetrics() {
@@ -3169,7 +3195,8 @@
                     pgInfoRequested: null,
                     similarCustomers: generateSimilarCustomers(),
                     matchingFeatures: [],
-                    customerHealthIndex: Math.floor(Math.random() * 100) + 1
+                    customerHealthIndex: Math.floor(Math.random() * 100) + 1,
+                    isHot: ['None', 'None', 'None', 'None', 'CRZ', 'Critical Blocker', 'TS Escalate'][Math.floor(Math.random() * 7)]
                 });
             }
             
@@ -3201,7 +3228,8 @@
                 pgInfoRequested: 'Please provide more details about the specific authentication protocols that need to be supported and any existing third-party MFA solutions that require integration. Also, clarify the expected timeline for deployment and any compliance requirements (e.g., NIST, FedRAMP) that must be met.',
                 similarCustomers: ['Fabrikam Inc', 'Woodgrove Bank', 'Litware Inc'],
                 matchingFeatures: [],
-                customerHealthIndex: 72
+                customerHealthIndex: 72,
+                isHot: 'Critical Blocker'
             });
             
             // Assign matching features based on product
@@ -3289,6 +3317,9 @@
                 const healthClass = dcr.customerHealthIndex <= 33 ? 'health-low' : (dcr.customerHealthIndex <= 66 ? 'health-medium' : 'health-high');
                 const healthIndexCell = '<span class="health-index ' + healthClass + '">' + dcr.customerHealthIndex + '</span>';
                 
+                const isHotClass = dcr.isHot === 'None' ? 'hot-none' : 'hot-critical';
+                const isHotCell = '<span class="is-hot-badge ' + isHotClass + '">' + dcr.isHot + '</span>';
+                
                 row.innerHTML = '<td><span class="dcr-id" onclick="showDetailView(\'' + dcr.id + '\')">' + dcr.id + '</span></td>' +
                     '<td>' + dcr.product + '</td>' +
                     '<td>' + formatDate(dcr.createdDate) + '</td>' +
@@ -3296,6 +3327,7 @@
                     '<td><span class="requester-link" onclick="event.stopPropagation(); openMessageModal(\'' + dcr.id + '\')">' + dcr.requester + '</span></td>' +
                     '<td>' + dcr.customer + '</td>' +
                     '<td>' + healthIndexCell + '</td>' +
+                    '<td>' + isHotCell + '</td>' +
                     '<td class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
                     '<td><span class="priority ' + dcr.priority.toLowerCase() + '">' + dcr.priority + '</span></td>' +
                     '<td>' + duplicationCell + '</td>' +
@@ -3474,6 +3506,10 @@
             // Populate Health Index with styled badge
             const healthClass = dcr.customerHealthIndex <= 33 ? 'health-low' : (dcr.customerHealthIndex <= 66 ? 'health-medium' : 'health-high');
             document.getElementById('detailHealthIndex').innerHTML = '<span class="health-index ' + healthClass + '">' + dcr.customerHealthIndex + '</span>';
+            
+            // Populate Is Hot with styled badge
+            const isHotClass = dcr.isHot === 'None' ? 'hot-none' : 'hot-critical';
+            document.getElementById('detailIsHot').innerHTML = '<span class="is-hot-badge ' + isHotClass + '">' + dcr.isHot + '</span>';
             
             document.getElementById('detailCreatedDate').textContent = formatDate(dcr.createdDate);
             document.getElementById('detailUseCase').textContent = dcr.useCase;
@@ -4539,6 +4575,10 @@
             // Populate Health Index with styled badge
             const adoHealthClass = dcr.customerHealthIndex <= 33 ? 'health-low' : (dcr.customerHealthIndex <= 66 ? 'health-medium' : 'health-high');
             document.getElementById('adoHealthIndex').innerHTML = '<span class="health-index ' + adoHealthClass + '">' + dcr.customerHealthIndex + '</span>';
+            
+            // Populate Is Hot with styled badge
+            const adoIsHotClass = dcr.isHot === 'None' ? 'hot-none' : 'hot-critical';
+            document.getElementById('adoIsHot').innerHTML = '<span class="is-hot-badge ' + adoIsHotClass + '">' + dcr.isHot + '</span>';
             
             document.getElementById('adoSource').textContent = dcr.source;
             document.getElementById('adoProductGroup').textContent = dcr.submittedProductGroup || '-';

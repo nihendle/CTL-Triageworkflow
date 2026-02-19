@@ -114,34 +114,47 @@
         /* Performance Metrics Styles */
         .metrics-dashboard {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
             margin-bottom: 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
 
         .metric-card {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s, box-shadow 0.2s;
+            padding: 20px 24px;
+            transition: background 0.2s;
+            border-left: none;
+            position: relative;
+        }
+
+        .metric-card:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background: #e5e7eb;
         }
 
         .metric-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            background: #f9fafb;
         }
 
         .metric-card.red {
-            border-left: 4px solid #dc2626;
+            border-bottom: 3px solid #dc2626;
         }
 
         .metric-card.green {
-            border-left: 4px solid #059669;
+            border-bottom: 3px solid #059669;
         }
 
         .metric-card.yellow {
-            border-left: 4px solid #f59e0b;
+            border-bottom: 3px solid #f59e0b;
         }
 
         .metric-label {
@@ -150,14 +163,14 @@
             color: #6b7280;
             font-weight: 600;
             letter-spacing: 0.05em;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .metric-value {
-            font-size: 32px;
+            font-size: 28px;
             font-weight: 700;
             color: #1f2937;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .metric-card.red .metric-value {
@@ -173,19 +186,19 @@
         }
 
         .metric-subtitle {
-            font-size: 13px;
+            font-size: 12px;
             color: #9ca3af;
-        }
-
-        @media (max-width: 1200px) {
-            .metrics-dashboard {
-                grid-template-columns: repeat(2, 1fr);
-            }
         }
 
         @media (max-width: 768px) {
             .metrics-dashboard {
                 grid-template-columns: 1fr;
+            }
+            .metric-card:not(:last-child)::after {
+                display: none;
+            }
+            .metric-card:not(:last-child) {
+                border-bottom: 1px solid #e5e7eb;
             }
         }
 
@@ -1656,6 +1669,345 @@
                 top: 0;
             }
         }
+
+        /* === TIER 1 & 2: Tabs Navigation === */
+        .tabs-nav {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 0;
+            overflow-x: auto;
+        }
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border: none;
+            background: transparent;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn:hover { color: #374151; background: #f9fafb; }
+        .tab-btn.active { color: #0078d4; border-bottom-color: #0078d4; font-weight: 600; }
+        .tab-btn .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 22px;
+            height: 22px;
+            padding: 0 6px;
+            border-radius: 11px;
+            font-size: 12px;
+            font-weight: 600;
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        .tab-btn.active .tab-count { background: #0078d4; color: white; }
+        .tab-btn .tab-count.alert { background: #dc2626; color: white; }
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* === TIER 1: Search, Filter & Sort === */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px 20px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            align-items: center;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 8px 14px;
+            flex: 1;
+            min-width: 220px;
+            max-width: 400px;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus-within { border-color: #0078d4; box-shadow: 0 0 0 3px rgba(0,120,212,0.1); }
+        .search-box svg { color: #9ca3af; flex-shrink: 0; }
+        .search-box input {
+            border: none;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+            background: transparent;
+        }
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 20px;
+            background: white;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filter-chip:hover { border-color: #0078d4; color: #0078d4; }
+        .filter-chip.active { background: #0078d4; color: white; border-color: #0078d4; }
+        .filter-chip select {
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 13px;
+            color: inherit;
+            cursor: pointer;
+            padding-right: 4px;
+        }
+        .filter-chip.active select { color: white; }
+        .column-toggle-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: white;
+            font-size: 12px;
+            color: #6b7280;
+            cursor: pointer;
+            margin-left: auto;
+        }
+        .column-toggle-btn:hover { border-color: #0078d4; color: #0078d4; }
+        .column-toggle-popup {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 200;
+            display: none;
+            min-width: 200px;
+        }
+        .column-toggle-popup.active { display: block; }
+        .column-toggle-popup label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 4px;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+        }
+        .column-toggle-popup label:hover { background: #f3f4f6; border-radius: 4px; }
+
+        th.sortable { cursor: pointer; user-select: none; }
+        th.sortable:hover { background: #eef2ff; }
+        th.sortable::after { content: ' ▸'; font-size: 10px; color: #9ca3af; }
+        th.sortable.sort-asc::after { content: ' ▲'; color: #0078d4; }
+        th.sortable.sort-desc::after { content: ' ▼'; color: #0078d4; }
+
+        /* === TIER 1: Hot Items Alert Banner === */
+        .hot-alert-banner {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            animation: pulse-border 2s infinite;
+        }
+        .hot-alert-banner.visible { display: flex; }
+        .hot-alert-banner svg { color: #dc2626; flex-shrink: 0; }
+        .hot-alert-banner-text { font-size: 14px; font-weight: 600; color: #dc2626; }
+        .hot-alert-banner-sub { font-size: 13px; color: #991b1b; margin-left: 4px; font-weight: 400; }
+        @keyframes pulse-border {
+            0%, 100% { border-color: #fca5a5; }
+            50% { border-color: #dc2626; }
+        }
+
+        /* === TIER 2: Toast Notifications === */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .toast {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            font-size: 14px;
+            color: #1f2937;
+            min-width: 320px;
+            max-width: 480px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #059669;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-left-color: #059669; }
+        .toast.error { border-left-color: #dc2626; }
+        .toast.warning { border-left-color: #f59e0b; }
+        .toast.info { border-left-color: #0078d4; }
+        .toast-icon { font-size: 18px; flex-shrink: 0; }
+        .toast-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 4px;
+        }
+
+        /* === TIER 2: Product Maturity Badge === */
+        .maturity-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            vertical-align: middle;
+            margin-left: 6px;
+        }
+        .maturity-badge.incubation { background: #ede9fe; color: #7c3aed; }
+        .maturity-badge.early-adoption { background: #dbeafe; color: #2563eb; }
+        .maturity-badge.scale { background: #d1fae5; color: #059669; }
+        .maturity-badge.support { background: #fef3c7; color: #d97706; }
+        .maturity-badge.maturity { background: #f3f4f6; color: #6b7280; }
+
+        /* === TIER 2: Onboarding Overlay === */
+        .onboarding-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 5000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .onboarding-overlay.active { opacity: 1; visibility: visible; }
+        .onboarding-card {
+            background: white;
+            border-radius: 16px;
+            padding: 40px 36px;
+            max-width: 520px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        .onboarding-card h2 { font-size: 22px; font-weight: 700; color: #1f2937; margin-bottom: 8px; }
+        .onboarding-card .subtitle { font-size: 14px; color: #6b7280; margin-bottom: 28px; }
+        .onboarding-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            text-align: left;
+            margin-bottom: 28px;
+        }
+        .onboarding-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px;
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+        .onboarding-step-num {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: #0078d4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .onboarding-step-text { font-size: 14px; color: #374151; line-height: 1.5; }
+        .onboarding-step-text strong { color: #1f2937; }
+
+        /* === TIER 1: AI Routing Suggestion === */
+        .ai-routing-card {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1px solid #bae6fd;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .ai-routing-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 0;
+            font-size: 13px;
+        }
+        .ai-routing-row .label { color: #6b7280; }
+        .ai-routing-row .value { font-weight: 600; color: #0c4a6e; }
+        .ai-routing-confidence {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #bae6fd;
+        }
+        .confidence-bar {
+            flex: 1;
+            height: 6px;
+            background: #e0f2fe;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0078d4, #38bdf8);
+            border-radius: 3px;
+        }
+        .ai-routing-apply {
+            margin-top: 10px;
+            width: 100%;
+            padding: 8px;
+            background: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .ai-routing-apply:hover { background: #005a9e; }
     </style>
 </head>
 <body>
@@ -1695,181 +2047,184 @@
                 <div class="metric-value" id="pgValue">0</div>
                 <div class="metric-subtitle">items submitted to PG</div>
             </div>
-            <div class="metric-card" id="metricMoreInfo">
-                <div class="metric-label">Request More Info</div>
-                <div class="metric-value" id="moreInfoValue">0</div>
-                <div class="metric-subtitle">items awaiting response</div>
-            </div>
         </div>
 
         <div id="mainView" class="main-view">
-            <div class="card animate-in">
-                <div class="card-header">
-                    <h2>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                            <line x1="3" y1="9" x2="21" y2="9"></line>
-                            <line x1="9" y1="21" x2="9" y2="9"></line>
-                        </svg>
-                        DCR Triage Queue
-                        <span class="badge" id="queueCount">0</span>
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>DCR ID</th>
-                                    <th>Product Name</th>
-                                    <th>Created Date</th>
-                                    <th>Days Since Created</th>
-                                    <th>Requester</th>
-                                    <th>Customer Name</th>
-                                    <th>Health Index</th>
-                                    <th>Is Hot</th>
-                                    <th>Description</th>
-                                    <th>Priority</th>
-                                    <th>Duplication Score</th>
-                                    <th>FR Exists</th>
-                                    <th>DCR Status</th>
-                                    <th>Source</th>
-                                    <th>Submit to PG</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dcrTableBody"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card pending-section animate-in">
-                <div class="card-header">
-                    <h2>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        Pending PG Response
-                        <span class="badge pending" id="pendingCount">0</span>
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div id="pendingTableContainer">
-                        <div class="empty-state" id="pendingEmptyState">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <p>No DCRs pending PG response</p>
-                        </div>
-                        <div class="table-container" id="pendingTable" style="display: none;">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>DCR ID</th>
-                                        <th>Product Name</th>
-                                        <th>Product Group</th>
-                                        <th>Feature Area</th>
-                                        <th>Submitted Date</th>
-                                        <th>Days Since Created</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="pendingTableBody"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+            <!-- Hot Alert Banner -->
+            <div class="hot-alert-banner" id="hotAlertBanner">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <span class="hot-alert-banner-text" id="hotAlertText">0 critical items need immediate triage</span>
+                <span class="hot-alert-banner-sub">— Hot items are pinned to the top of the queue</span>
             </div>
 
             <div class="card animate-in">
-                <div class="card-header">
-                    <h2>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="20 6 9 17 4 12"></polyline>
-                        </svg>
-                        Triaged DCRs
-                        <span class="badge" id="triagedCount" style="background: #10b981;">0</span>
-                    </h2>
+                <!-- Tabbed Navigation -->
+                <div class="tabs-nav" id="mainTabsNav">
+                    <button class="tab-btn active" data-tab="queue" onclick="switchTab('queue')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+                        Triage Queue <span class="tab-count" id="tabQueueCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="pending" onclick="switchTab('pending')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Pending PG <span class="tab-count" id="tabPendingCount">0</span>
+                    </button>
+                    <button class="tab-btn" data-tab="triaged" onclick="switchTab('triaged')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Triaged <span class="tab-count" id="tabTriagedCount">0</span>
+                    </button>
+
                 </div>
-                <div class="card-body">
-                    <div id="triagedTableContainer">
-                        <div class="empty-state" id="triagedEmptyState">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <p>No triaged DCRs</p>
+
+                <!-- Search, Filter & Column Toggle Toolbar -->
+                <div class="toolbar" id="mainToolbar">
+                    <div class="search-box">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                        <input type="text" id="searchInput" placeholder="Search by DCR ID, customer, requester, description..." oninput="applyFiltersAndSort()">
+                    </div>
+                    <div class="filter-chips">
+                        <div class="filter-chip">
+                            <select id="filterProduct" onchange="applyFiltersAndSort()">
+                                <option value="">All Products</option>
+                                <option value="Defender for Identity">Defender for Identity</option>
+                                <option value="Defender for Endpoint">Defender for Endpoint</option>
+                                <option value="Sentinel">Sentinel</option>
+                                <option value="Defender 365">Defender 365</option>
+                            </select>
                         </div>
-                        <div class="table-container" id="triagedTable" style="display: none;">
+                        <div class="filter-chip">
+                            <select id="filterPriority" onchange="applyFiltersAndSort()">
+                                <option value="">All Priorities</option>
+                                <option value="P0">P0</option>
+                                <option value="P1">P1</option>
+                                <option value="P2">P2</option>
+                            </select>
+                        </div>
+                        <div class="filter-chip">
+                            <select id="filterSource" onchange="applyFiltersAndSort()">
+                                <option value="">All Sources</option>
+                                <option value="CSS">CSS</option>
+                                <option value="STU">STU</option>
+                                <option value="CSU">CSU</option>
+                                <option value="FastTrack">FastTrack</option>
+                            </select>
+                        </div>
+                        <div class="filter-chip">
+                            <select id="filterHot" onchange="applyFiltersAndSort()">
+                                <option value="">All Urgency</option>
+                                <option value="hot">Hot Only</option>
+                                <option value="none">Non-Hot Only</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="position:relative; margin-left:auto;">
+                        <button class="column-toggle-btn" onclick="toggleColumnPopup()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+                            Columns
+                        </button>
+                        <div class="column-toggle-popup" id="columnTogglePopup">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab Panel: Triage Queue -->
+                <div class="tab-panel active" id="tabPanelQueue">
+                    <div class="card-body">
+                        <div class="table-container">
                             <table>
                                 <thead>
-                                    <tr>
-                                        <th>DCR ID</th>
-                                        <th>Product Name</th>
-                                        <th>Created Date</th>
-                                        <th>Days Since Created</th>
+                                    <tr id="queueTableHeader">
+                                        <th class="sortable" data-sort="id" onclick="sortTable('id')">DCR ID</th>
+                                        <th class="sortable" data-sort="product" onclick="sortTable('product')">Product</th>
+                                        <th class="sortable col-toggle" data-col="createdDate" data-sort="createdDate" onclick="sortTable('createdDate')">Created Date</th>
+                                        <th class="sortable" data-sort="daysSince" onclick="sortTable('daysSince')">Days Open</th>
                                         <th>Requester</th>
-                                        <th>Customer Name</th>
-                                        <th>Description</th>
-                                        <th>Priority</th>
-                                        <th>Decision</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
+                                        <th class="sortable" data-sort="customer" onclick="sortTable('customer')">Customer</th>
+                                        <th class="sortable col-toggle" data-col="isHot" data-sort="isHot" onclick="sortTable('isHot')">Is Hot</th>
+                                        <th class="sortable col-toggle" data-col="description">Description</th>
+                                        <th class="sortable" data-sort="priority" onclick="sortTable('priority')">Priority</th>
+                                        <th class="col-toggle" data-col="source">Source</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody id="triagedTableBody"></tbody>
+                                <tbody id="dcrTableBody"></tbody>
                             </table>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="card animate-in">
-                <div class="card-header">
-                    <h2>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                            <path d="M21 3v5h-5"></path>
-                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                            <path d="M3 21v-5h5"></path>
-                        </svg>
-                        Pending More Information
-                        <span class="badge pending" id="pendingMoreInfoCount">0</span>
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div id="pendingMoreInfoTableContainer">
-                        <div class="empty-state" id="pendingMoreInfoEmptyState">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                            </svg>
-                            <p>No DCRs awaiting additional information</p>
-                        </div>
-                        <div class="table-container" id="pendingMoreInfoTable" style="display: none;">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>DCR ID</th>
-                                        <th>Product Name</th>
-                                        <th>Created Date</th>
-                                        <th>Days Since Created</th>
-                                        <th>Requester</th>
-                                        <th>Customer Name</th>
-                                        <th>Description</th>
-                                        <th>Priority</th>
-                                        <th>Messages Sent</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="pendingMoreInfoTableBody"></tbody>
-                            </table>
+                <!-- Tab Panel: Pending PG Response -->
+                <div class="tab-panel" id="tabPanelPending">
+                    <div class="card-body">
+                        <div id="pendingTableContainer">
+                            <div class="empty-state" id="pendingEmptyState">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                <p>No DCRs pending PG response</p>
+                            </div>
+                            <div class="table-container" id="pendingTable" style="display: none;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>DCR ID</th>
+                                            <th>Product Name</th>
+                                            <th>Product Group</th>
+                                            <th>Feature Area</th>
+                                            <th>Submitted Date</th>
+                                            <th>Days Since Created</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pendingTableBody"></tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Tab Panel: Triaged DCRs -->
+                <div class="tab-panel" id="tabPanelTriaged">
+                    <div class="card-body">
+                        <div id="triagedTableContainer">
+                            <div class="empty-state" id="triagedEmptyState">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                </svg>
+                                <p>No triaged DCRs</p>
+                            </div>
+                            <div class="table-container" id="triagedTable" style="display: none;">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>DCR ID</th>
+                                            <th>Product Name</th>
+                                            <th>Created Date</th>
+                                            <th>Days Since Created</th>
+                                            <th>Requester</th>
+                                            <th>Customer Name</th>
+                                            <th>Description</th>
+                                            <th>Priority</th>
+                                            <th>Decision</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="triagedTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
             </div>
         </div>
 
@@ -2600,6 +2955,34 @@
                     <span class="copilot-badge">AI Insights</span>
                 </div>
                 <div class="copilot-content">
+                    <!-- AI Suggested Routing -->
+                    <div class="copilot-section">
+                        <div class="copilot-section-header">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                            <h4>Suggested Routing</h4>
+                        </div>
+                        <div class="ai-routing-card" id="aiRoutingCard">
+                            <div class="ai-routing-row">
+                                <span class="label">Product Group</span>
+                                <span class="value" id="aiRoutingPG">—</span>
+                            </div>
+                            <div class="ai-routing-row">
+                                <span class="label">Feature Area</span>
+                                <span class="value" id="aiRoutingFA">—</span>
+                            </div>
+                            <div class="ai-routing-confidence">
+                                <span style="font-size:12px; color:#6b7280;">Confidence</span>
+                                <div class="confidence-bar"><div class="confidence-fill" id="aiRoutingConfFill" style="width:0%"></div></div>
+                                <span style="font-size:13px; font-weight:600; color:#0c4a6e;" id="aiRoutingConfPct">0%</span>
+                            </div>
+                            <div style="font-size:11px; color:#6b7280; margin-top:6px;" id="aiRoutingBasis">Based on 0 similar DCRs routed previously</div>
+                            <button class="ai-routing-apply" id="aiRoutingApplyBtn" onclick="applyAiRouting()">Apply Suggested Routing</button>
+                        </div>
+                    </div>
+
                     <div class="copilot-section">
                         <div class="copilot-section-header">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2770,15 +3153,28 @@
 
     <!-- Rejected Modal -->
     <div class="modal-overlay" id="rejectedModal">
-        <div class="modal">
+        <div class="modal" style="max-width: 680px;">
             <div class="modal-header">
                 <h3>Reject DCR</h3>
                 <button class="modal-close" onclick="closeRejectedModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
+                    <label for="rejectionReasonSelect">Rejection Reason</label>
+                    <select id="rejectionReasonSelect" class="form-select" onchange="onRejectionReasonChange()" style="width:100%; padding:10px 12px; border:1px solid #d1d5db; border-radius:8px; font-size:14px; margin-bottom:12px;">
+                        <option value="">-- Select a rejection reason --</option>
+                        <option value="not-planned">Reject – Not planned (not aligned with product plans)</option>
+                        <option value="insufficient-info">Reject – Insufficient information (resubmission required)</option>
+                        <option value="workaround">Reject – Workaround available</option>
+                        <option value="not-feature-request">Reject – Not a feature request (guidance provided)</option>
+                        <option value="not-planned-extended">Reject – Not planned (after extended tracking)</option>
+                        <option value="evidence-gathering">Reject – Not planned – Re-evaluate based on additional customer demand (Evidence Gathering)</option>
+                        <option value="pg-not-planned">PG reviewed – Not planned</option>
+                    </select>
+                </div>
+                <div class="form-group">
                     <label for="rejectionNotes">Rejection Notes</label>
-                    <textarea id="rejectionNotes" class="form-textarea" placeholder="Please provide the reason for rejecting this DCR..." rows="6"></textarea>
+                    <textarea id="rejectionNotes" class="form-textarea" placeholder="Select a reason above to populate, or type custom notes..." rows="8"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -2927,42 +3323,7 @@
         </div>
     </div>
 
-    <!-- Add More Information Modal -->
-    <div class="modal-overlay" id="addMoreInfoModal">
-        <div class="modal">
-            <div class="modal-header">
-                <h3>Add More Information</h3>
-                <button class="modal-close" onclick="closeAddMoreInfoModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <p style="color: #6b7280; margin-bottom: 16px;">Additional information received for <strong id="addInfoDcrId"></strong></p>
-                <div class="form-group">
-                    <label for="additionalInfo">Additional Information</label>
-                    <textarea id="additionalInfo" class="form-textarea" placeholder="Enter the additional information received from the requester..." rows="6"></textarea>
-                </div>
-                <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
-                    <p style="color: #374151; font-weight: 600; margin-bottom: 16px;">Complete Triage Decision</p>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <button class="decision-btn" onclick="completeTriageAsAvailable()">
-                            <span style="font-weight: 600;">✓ Mark as Feature Already Available</span>
-                            <span style="font-size: 12px; color: #6b7280;">Feature exists</span>
-                        </button>
-                        <button class="decision-btn" onclick="completeTriageAsRejected()">
-                            <span style="font-weight: 600;">✗ Reject DCR</span>
-                            <span style="font-size: 12px; color: #6b7280;">Not within scope</span>
-                        </button>
-                        <button class="decision-btn" onclick="completeTriageAsEvidenceGathering()">
-                            <span style="font-weight: 600;">→ Evidence Gathering</span>
-                            <span style="font-size: 12px; color: #6b7280;">Link to feature request</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeAddMoreInfoModal()">Cancel</button>
-            </div>
-        </div>
-    </div>
+
 
     <script>
         const featureAreas = {
@@ -3070,6 +3431,285 @@
         let currentDcr = null;
         let modalDcr = null;
 
+        // === Product Maturity Data ===
+        const productMaturity = {
+            'Defender for Identity': { phase: 'Scale', cssClass: 'scale' },
+            'Defender for Endpoint': { phase: 'Maturity', cssClass: 'maturity' },
+            'Sentinel': { phase: 'Scale', cssClass: 'scale' },
+            'Defender 365': { phase: 'Early Adoption', cssClass: 'early-adoption' }
+        };
+
+        function getMaturityBadge(product) {
+            const m = productMaturity[product];
+            if (!m) return '';
+            return '<span class="maturity-badge ' + m.cssClass + '">' + m.phase + '</span>';
+        }
+
+        // === Sort State ===
+        let currentSortField = null;
+        let currentSortDir = 'asc';
+
+        // === Column Visibility (Tier 2: reduced defaults) ===
+        const columnConfig = [
+            { key: 'createdDate', label: 'Created Date', default: false },
+            { key: 'isHot', label: 'Is Hot', default: true },
+            { key: 'description', label: 'Description', default: true },
+            { key: 'source', label: 'Source', default: false }
+        ];
+        let columnVisibility = {};
+        columnConfig.forEach(function(c) { columnVisibility[c.key] = c.default; });
+
+        function initColumnToggle() {
+            const popup = document.getElementById('columnTogglePopup');
+            popup.innerHTML = '';
+            columnConfig.forEach(function(c) {
+                const label = document.createElement('label');
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.checked = columnVisibility[c.key];
+                cb.onchange = function() { columnVisibility[c.key] = cb.checked; applyColumnVisibility(); renderMainTable(); };
+                label.appendChild(cb);
+                label.appendChild(document.createTextNode(' ' + c.label));
+                popup.appendChild(label);
+            });
+        }
+
+        function toggleColumnPopup() {
+            document.getElementById('columnTogglePopup').classList.toggle('active');
+        }
+
+        function applyColumnVisibility() {
+            document.querySelectorAll('[data-col]').forEach(function(el) {
+                var col = el.getAttribute('data-col');
+                el.style.display = columnVisibility[col] ? '' : 'none';
+            });
+        }
+
+        // Close column popup on outside click
+        document.addEventListener('click', function(e) {
+            const popup = document.getElementById('columnTogglePopup');
+            const btn = document.querySelector('.column-toggle-btn');
+            if (popup && btn && !popup.contains(e.target) && !btn.contains(e.target)) {
+                popup.classList.remove('active');
+            }
+        });
+
+        // === Toast Notification System (replaces alert()) ===
+        function showToast(message, type, duration) {
+            type = type || 'success';
+            duration = duration || 4000;
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            const icons = { success: '✓', error: '✗', warning: '⚠', info: 'ℹ' };
+            toast.innerHTML = '<span class="toast-icon">' + (icons[type] || '✓') + '</span>' +
+                '<span>' + message + '</span>' +
+                '<button class="toast-close" onclick="this.parentElement.remove()">&times;</button>';
+            container.appendChild(toast);
+            requestAnimationFrame(function() { toast.classList.add('show'); });
+            setTimeout(function() {
+                toast.classList.remove('show');
+                setTimeout(function() { if (toast.parentElement) toast.remove(); }, 300);
+            }, duration);
+        }
+
+        // === Tab Switching ===
+        let currentTab = 'queue';
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(function(btn) { btn.classList.remove('active'); });
+            document.querySelectorAll('.tab-panel').forEach(function(p) { p.classList.remove('active'); });
+            document.querySelector('.tab-btn[data-tab="' + tab + '"]').classList.add('active');
+            var panelMap = { queue: 'tabPanelQueue', pending: 'tabPanelPending', triaged: 'tabPanelTriaged' };
+            document.getElementById(panelMap[tab]).classList.add('active');
+            // Show toolbar only for queue tab
+            document.getElementById('mainToolbar').style.display = (tab === 'queue') ? 'flex' : 'none';
+        }
+
+        function updateTabCounts() {
+            var queueItems = dcrData.filter(function(dcr) { return !dcr.triageOutcome || dcr.pgRequestMoreInfo; });
+            var pendingItems = dcrData.filter(function(dcr) { return dcr.submittedToPG; });
+            var triagedItems = dcrData.filter(function(dcr) { return dcr.triageOutcome; });
+            document.getElementById('tabQueueCount').textContent = queueItems.length;
+            document.getElementById('tabPendingCount').textContent = pendingItems.length;
+            document.getElementById('tabTriagedCount').textContent = triagedItems.length;
+            // Hot alert on queue tab count
+            var hotCount = queueItems.filter(function(dcr) { return dcr.isHot !== 'None'; }).length;
+            if (hotCount > 0) {
+                document.getElementById('tabQueueCount').classList.add('alert');
+            } else {
+                document.getElementById('tabQueueCount').classList.remove('alert');
+            }
+        }
+
+        // === Hot Alert Banner (reflects current filter state) ===
+        function updateHotAlertBanner() {
+            var filteredItems = getFilteredQueueItems();
+            var hotItems = filteredItems.filter(function(dcr) { return dcr.isHot !== 'None'; });
+            var banner = document.getElementById('hotAlertBanner');
+            if (hotItems.length > 0) {
+                banner.classList.add('visible');
+                document.getElementById('hotAlertText').textContent = hotItems.length + ' critical item' + (hotItems.length > 1 ? 's' : '') + ' need' + (hotItems.length === 1 ? 's' : '') + ' immediate triage';
+            } else {
+                banner.classList.remove('visible');
+            }
+        }
+
+        // === Search, Filter & Sort ===
+        function getDaysSince(createdDate) {
+            var today = new Date();
+            var created = new Date(createdDate);
+            return Math.floor((today - created) / (1000 * 60 * 60 * 24));
+        }
+
+        function applyFiltersAndSort() {
+            renderMainTable();
+        }
+
+        function getFilteredQueueItems() {
+            var items = dcrData.filter(function(dcr) {
+                return !dcr.triageOutcome || dcr.pgRequestMoreInfo;
+            });
+
+            // Search
+            var search = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            if (search) {
+                items = items.filter(function(dcr) {
+                    return dcr.id.toLowerCase().includes(search) ||
+                        dcr.customer.toLowerCase().includes(search) ||
+                        dcr.requester.toLowerCase().includes(search) ||
+                        dcr.description.toLowerCase().includes(search) ||
+                        dcr.product.toLowerCase().includes(search);
+                });
+            }
+
+            // Filters
+            var filterProduct = document.getElementById('filterProduct').value;
+            var filterPriority = document.getElementById('filterPriority').value;
+            var filterSource = document.getElementById('filterSource').value;
+            var filterHot = document.getElementById('filterHot').value;
+            if (filterProduct) items = items.filter(function(d) { return d.product === filterProduct; });
+            if (filterPriority) items = items.filter(function(d) { return d.priority === filterPriority; });
+            if (filterSource) items = items.filter(function(d) { return d.source === filterSource; });
+            if (filterHot === 'hot') items = items.filter(function(d) { return d.isHot !== 'None'; });
+            if (filterHot === 'none') items = items.filter(function(d) { return d.isHot === 'None'; });
+
+            // Sort: Hot items always first, then by selected column or default (priority then age)
+            items.sort(function(a, b) {
+                // Hot items pinned to top
+                var aHot = a.isHot !== 'None' ? 0 : 1;
+                var bHot = b.isHot !== 'None' ? 0 : 1;
+                if (aHot !== bHot) return aHot - bHot;
+
+                // If user clicked a column sort
+                if (currentSortField) {
+                    var valA, valB;
+                    switch(currentSortField) {
+                        case 'id': valA = a.id; valB = b.id; break;
+                        case 'product': valA = a.product; valB = b.product; break;
+                        case 'createdDate': valA = a.createdDate.getTime(); valB = b.createdDate.getTime(); break;
+                        case 'daysSince': valA = getDaysSince(a.createdDate); valB = getDaysSince(b.createdDate); break;
+                        case 'customer': valA = a.customer; valB = b.customer; break;
+                        case 'priority': valA = a.priority; valB = b.priority; break;
+                        case 'isHot': valA = a.isHot; valB = b.isHot; break;
+                        default: valA = 0; valB = 0;
+                    }
+                    if (typeof valA === 'string') {
+                        var cmp = valA.localeCompare(valB);
+                        return currentSortDir === 'asc' ? cmp : -cmp;
+                    }
+                    return currentSortDir === 'asc' ? valA - valB : valB - valA;
+                }
+
+                // Default: P0 > P1 > P2, then oldest first
+                if (a.priority !== b.priority) return a.priority.localeCompare(b.priority);
+                return a.createdDate - b.createdDate;
+            });
+
+            return items;
+        }
+
+        function sortTable(field) {
+            if (currentSortField === field) {
+                currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortField = field;
+                currentSortDir = 'asc';
+            }
+            // Update header indicators
+            document.querySelectorAll('#queueTableHeader th.sortable').forEach(function(th) {
+                th.classList.remove('sort-asc', 'sort-desc');
+                if (th.getAttribute('data-sort') === field) {
+                    th.classList.add(currentSortDir === 'asc' ? 'sort-asc' : 'sort-desc');
+                }
+            });
+            renderMainTable();
+        }
+
+        // === Onboarding ===
+        function showOnboarding() {
+            if (localStorage.getItem('dcrTriageOnboardingDismissed') === 'true') return;
+            document.getElementById('onboardingOverlay').classList.add('active');
+        }
+        function dismissOnboarding() {
+            document.getElementById('onboardingOverlay').classList.remove('active');
+            if (document.getElementById('dontShowAgain').checked) {
+                localStorage.setItem('dcrTriageOnboardingDismissed', 'true');
+            }
+        }
+
+        // === AI Routing Suggestion ===
+        function getAiRoutingSuggestion(dcr) {
+            // Simulated routing recommendation based on product + feature area mapping
+            var pg = 'Microsoft ' + dcr.product;
+            var areas = featureAreas[dcr.product] || [];
+            // Pick the most relevant area based on description keywords
+            var bestArea = areas[0];
+            var bestScore = 0;
+            areas.forEach(function(area) {
+                var words = area.toLowerCase().split(' ');
+                var score = 0;
+                words.forEach(function(w) {
+                    if (dcr.description.toLowerCase().includes(w) && w.length > 3) score += 1;
+                });
+                if (score > bestScore) { bestScore = score; bestArea = area; }
+            });
+            var confidence = Math.min(95, 65 + bestScore * 10 + Math.floor(Math.random() * 15));
+            var basisCount = Math.floor(Math.random() * 6) + 2;
+            return { pg: pg, featureArea: bestArea, confidence: confidence, basisCount: basisCount };
+        }
+
+        function populateAiRouting(dcr) {
+            var suggestion = getAiRoutingSuggestion(dcr);
+            dcr._aiRouting = suggestion;
+            document.getElementById('aiRoutingPG').textContent = suggestion.pg;
+            document.getElementById('aiRoutingFA').textContent = suggestion.featureArea;
+            document.getElementById('aiRoutingConfFill').style.width = suggestion.confidence + '%';
+            document.getElementById('aiRoutingConfPct').textContent = suggestion.confidence + '%';
+            document.getElementById('aiRoutingBasis').textContent = 'Based on ' + suggestion.basisCount + ' similar DCRs routed previously';
+        }
+
+        function applyAiRouting() {
+            if (!currentDcr || !currentDcr._aiRouting) return;
+            openSubmitModal(currentDcr);
+            // Pre-select the product group
+            setTimeout(function() {
+                var pgSelect = document.getElementById('productGroupSelect');
+                pgSelect.value = currentDcr.product;
+                onProductGroupChange();
+                // Auto-advance to step 2 and pre-select feature area
+                setTimeout(function() {
+                    goNext();
+                    setTimeout(function() {
+                        var faSelect = document.getElementById('featureAreaSelect');
+                        faSelect.value = currentDcr._aiRouting.featureArea;
+                        faSelect.dispatchEvent(new Event('change'));
+                    }, 100);
+                }, 100);
+            }, 100);
+            showToast('AI routing suggestion applied — review and confirm', 'info');
+        }
+
         function generateRandomDate(start, end) {
             return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
         }
@@ -3117,7 +3757,7 @@
 
             // 2. Total DCRs in queue - current table count, 20+ is red
             const mainItems = dcrData.filter(function(dcr) {
-                return !dcr.triageOutcome && !(dcr.messagesSent && dcr.messagesSent > 0);
+                return !dcr.triageOutcome;
             });
             const queueCount = mainItems.length;
             document.getElementById('queueValue').textContent = queueCount;
@@ -3142,21 +3782,6 @@
                 pgCard.classList.add('yellow');
             } else {
                 pgCard.classList.add('green');
-            }
-
-            // 4. Total items requesting more information
-            const moreInfoCount = dcrData.filter(function(dcr) {
-                return dcr.messagesSent && dcr.messagesSent > 0;
-            }).length;
-            document.getElementById('moreInfoValue').textContent = moreInfoCount;
-            const moreInfoCard = document.getElementById('metricMoreInfo');
-            moreInfoCard.className = 'metric-card';
-            if (moreInfoCount >= 15) {
-                moreInfoCard.classList.add('red');
-            } else if (moreInfoCount >= 8) {
-                moreInfoCard.classList.add('yellow');
-            } else {
-                moreInfoCard.classList.add('green');
             }
         }
 
@@ -3200,38 +3825,6 @@
                 });
             }
             
-            // Add a test DCR with PG requesting more info
-            const testProduct = 'Defender for Identity';
-            const testProductAreas = featureAreas[testProduct];
-            dcrData.push({
-                id: 'DCR-1099',
-                title: 'Enhanced multi-factor authentication enforcement across hybrid identity scenarios',
-                product: testProduct,
-                productArea: testProductAreas[0],
-                createdDate: new Date('2025-12-15'),
-                requester: 'Sarah Johnson',
-                customer: 'Contoso Ltd',
-                description: 'Enhanced multi-factor authentication enforcement across hybrid identity scenarios',
-                priority: 'P1',
-                duplicationScore: 65,
-                frExists: 'Yes',
-                source: 'CSS',
-                useCase: 'Enable security teams to enforce MFA policies consistently across on-premises and cloud environments',
-                customerImpact: 'Critical security gap allowing potential unauthorized access to sensitive resources',
-                submittedToPG: false,
-                submittedProductGroup: 'Microsoft ' + testProduct,
-                submittedFeatureArea: testProductAreas[0],
-                submittedDate: new Date('2026-01-20'),
-                adoId: generateAdoId(),
-                adoStatus: 'Request More Info',
-                pgRequestMoreInfo: true,
-                pgInfoRequested: 'Please provide more details about the specific authentication protocols that need to be supported and any existing third-party MFA solutions that require integration. Also, clarify the expected timeline for deployment and any compliance requirements (e.g., NIST, FedRAMP) that must be met.',
-                similarCustomers: ['Fabrikam Inc', 'Woodgrove Bank', 'Litware Inc'],
-                matchingFeatures: [],
-                customerHealthIndex: 72,
-                isHot: 'Critical Blocker'
-            });
-            
             // Assign matching features based on product
             dcrData.forEach(function(dcr) {
                 dcr.matchingFeatures = getMatchingFeaturesForProduct(dcr.product, dcr.duplicationScore);
@@ -3267,15 +3860,18 @@
             const tbody = document.getElementById('dcrTableBody');
             tbody.innerHTML = '';
             
-            // Filter out items that have been triaged (have triageOutcome or messagesSent)
-            const mainItems = dcrData.filter(function(dcr) {
-                return (!dcr.triageOutcome && !(dcr.messagesSent && dcr.messagesSent > 0)) || dcr.pgRequestMoreInfo;
-            });
+            // Use filtered and sorted queue items
+            const mainItems = getFilteredQueueItems();
             
             mainItems.forEach(function(dcr) {
                 const row = document.createElement('tr');
                 row.className = 'clickable';
                 
+                // Highlight hot items
+                if (dcr.isHot !== 'None') {
+                    row.style.backgroundColor = '#fff8f0';
+                    row.style.borderLeft = '4px solid #ff6b00';
+                }
                 // Highlight rows where PG needs more info
                 if (dcr.pgRequestMoreInfo) {
                     row.style.backgroundColor = '#fef2f2';
@@ -3288,71 +3884,50 @@
                 
                 let submitCell = '';
                 if (dcr.pgRequestMoreInfo) {
-                    submitCell = '<span class="priority p0" style="background:#fee2e2; color:#dc2626; font-weight:600; cursor:pointer;" onclick="event.stopPropagation(); showDetailView(\'' + dcr.id + '\')">⚠️ PG Needs Info - Click to Respond</span>';
+                    submitCell = '<span class="priority p0" style="background:#fee2e2; color:#dc2626; font-weight:600; cursor:pointer;" onclick="event.stopPropagation(); showDetailView(\'' + dcr.id + '\')">⚠️ PG Needs Info</span>';
                 } else if (dcr.submittedToPG) {
                     submitCell = '<span class="submitted-indicator"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Submitted</span>';
                 } else {
                     submitCell = '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openSubmitModal(\'' + dcr.id + '\')">Submit to PG</button>';
                 }
                 
-                const dupClass = dcr.duplicationScore >= 70 ? 'high' : (dcr.duplicationScore >= 40 ? 'medium' : 'low');
-                const duplicationCell = '<span class="duplication-badge ' + dupClass + '">' + dcr.duplicationScore + '%</span>';
-                
-                let dcrStatus = 'Require Triage';
-                let statusBadgeClass = 'priority p2';
-
-                if (dcr.submittedToPG) {
-                    dcrStatus = 'Submitted for PG review';
-                    statusBadgeClass = 'priority p1';
-                } else if (dcr.messagesSent && dcr.messagesSent > 0) {
-                    dcrStatus = 'Pending more info';
-                    statusBadgeClass = 'priority p0';
-                } else if (dcr.triageOutcome) {
-                    dcrStatus = 'Triage completed';
-                    statusBadgeClass = 'priority p1';
-                }
-                
-                const dcrStatusCell = '<span class="' + statusBadgeClass + '">' + dcrStatus + '</span>';
-                
-                const healthClass = dcr.customerHealthIndex <= 33 ? 'health-low' : (dcr.customerHealthIndex <= 66 ? 'health-medium' : 'health-high');
-                const healthIndexCell = '<span class="health-index ' + healthClass + '">' + dcr.customerHealthIndex + '</span>';
-                
                 const isHotClass = dcr.isHot === 'None' ? 'hot-none' : 'hot-critical';
                 const isHotCell = '<span class="is-hot-badge ' + isHotClass + '">' + dcr.isHot + '</span>';
-                
+
+                // Build cells matching the 11-column header: DCR ID | Product | Created Date | Days Open | Requester | Customer | Is Hot | Description | Priority | Source | Actions
+                var vis = columnVisibility;
                 row.innerHTML = '<td><span class="dcr-id" onclick="showDetailView(\'' + dcr.id + '\')">' + dcr.id + '</span></td>' +
                     '<td>' + dcr.product + '</td>' +
-                    '<td>' + formatDate(dcr.createdDate) + '</td>' +
+                    '<td data-col="createdDate"' + (vis.createdDate ? '' : ' style="display:none"') + '>' + formatDate(dcr.createdDate) + '</td>' +
                     '<td>' + getDaysSinceCreatedBadge(dcr.createdDate) + '</td>' +
                     '<td><span class="requester-link" onclick="event.stopPropagation(); openMessageModal(\'' + dcr.id + '\')">' + dcr.requester + '</span></td>' +
                     '<td>' + dcr.customer + '</td>' +
-                    '<td>' + healthIndexCell + '</td>' +
-                    '<td>' + isHotCell + '</td>' +
-                    '<td class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
+                    '<td data-col="isHot"' + (vis.isHot ? '' : ' style="display:none"') + '>' + isHotCell + '</td>' +
+                    '<td data-col="description"' + (vis.description ? '' : ' style="display:none"') + ' class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
                     '<td><span class="priority ' + dcr.priority.toLowerCase() + '">' + dcr.priority + '</span></td>' +
-                    '<td>' + duplicationCell + '</td>' +
-                    '<td><span class="fr-badge ' + dcr.frExists.toLowerCase() + '">' + dcr.frExists + '</span></td>' +
-                    '<td>' + dcrStatusCell + '</td>' +
-                    '<td><span class="source-badge">' + dcr.source + '</span></td>' +
+                    '<td data-col="source"' + (vis.source ? '' : ' style="display:none"') + '><span class="source-badge">' + dcr.source + '</span></td>' +
                     '<td>' + submitCell + '</td>';
                 tbody.appendChild(row);
             });
 
-            document.getElementById('queueCount').textContent = mainItems.length;
+            // Update tab counts and hot banner
+            updateTabCounts();
+            updateHotAlertBanner();
+            applyColumnVisibility();
             updateMetrics();
             renderTriagedTable();
         }
 
         function renderTriagedTable() {
             const triaged = dcrData.filter(function(dcr) {
-                return dcr.triageOutcome && !(dcr.messagesSent && dcr.messagesSent > 0);
+                return dcr.triageOutcome;
             });
             
             const tbody = document.getElementById('triagedTableBody');
             const emptyState = document.getElementById('triagedEmptyState');
             const table = document.getElementById('triagedTable');
             
-            document.getElementById('triagedCount').textContent = triaged.length;
+            document.getElementById('tabTriagedCount').textContent = triaged.length;
             
             if (triaged.length === 0) {
                 emptyState.style.display = 'block';
@@ -3367,16 +3942,8 @@
             triaged.forEach(function(dcr) {
                 const row = document.createElement('tr');
                 
-                let dcrStatus = 'Require Triage';
-                let statusBadgeClass = 'priority p2';
-
-                if (dcr.messagesSent && dcr.messagesSent > 0) {
-                    dcrStatus = 'Pending more info';
-                    statusBadgeClass = 'priority p0';
-                } else if (dcr.triageOutcome) {
-                    dcrStatus = 'Triage completed';
-                    statusBadgeClass = 'priority p1';
-                }
+                let dcrStatus = 'Triage completed';
+                let statusBadgeClass = 'priority p1';
                 
                 const dcrStatusCell = '<span class="' + statusBadgeClass + '">' + dcrStatus + '</span>';
                 
@@ -3415,52 +3982,13 @@
             });
         }
 
-        function renderPendingMoreInfoTable() {
-            const pendingMoreInfo = dcrData.filter(function(dcr) {
-                return dcr.messagesSent && dcr.messagesSent > 0;
-            });
-            
-            const tbody = document.getElementById('pendingMoreInfoTableBody');
-            const emptyState = document.getElementById('pendingMoreInfoEmptyState');
-            const table = document.getElementById('pendingMoreInfoTable');
-            
-            document.getElementById('pendingMoreInfoCount').textContent = pendingMoreInfo.length;
-            
-            if (pendingMoreInfo.length === 0) {
-                emptyState.style.display = 'block';
-                table.style.display = 'none';
-                return;
-            }
-            
-            emptyState.style.display = 'none';
-            table.style.display = 'block';
-            tbody.innerHTML = '';
-            
-            pendingMoreInfo.forEach(function(dcr) {
-                const row = document.createElement('tr');
-                
-                row.innerHTML = '<td><span class="dcr-id" onclick="showDetailView(\'' + dcr.id + '\')">' + dcr.id + '</span></td>' +
-                    '<td>' + dcr.product + '</td>' +
-                    '<td>' + formatDate(dcr.createdDate) + '</td>' +
-                    '<td>' + getDaysSinceCreatedBadge(dcr.createdDate) + '</td>' +
-                    '<td>' + dcr.requester + '</td>' +
-                    '<td>' + dcr.customer + '</td>' +
-                    '<td class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
-                    '<td><span class="priority ' + dcr.priority.toLowerCase() + '">' + dcr.priority + '</span></td>' +
-                    '<td>' + dcr.messagesSent + '</td>' +
-                    '<td><button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openAddMoreInfoModal(\'' + dcr.id + '\')">Add Info</button></td>';
-                tbody.appendChild(row);
-            });
-            updateMetrics();
-        }
-
         function renderPendingTable() {
             const pending = dcrData.filter(function(dcr) { return dcr.submittedToPG; });
             const tbody = document.getElementById('pendingTableBody');
             const emptyState = document.getElementById('pendingEmptyState');
             const table = document.getElementById('pendingTable');
             
-            document.getElementById('pendingCount').textContent = pending.length;
+            document.getElementById('tabPendingCount').textContent = pending.length;
             
             if (pending.length === 0) {
                 emptyState.style.display = 'block';
@@ -3624,6 +4152,9 @@
                 hint = 'Moderate similarity detected with existing requests';
             }
             document.getElementById('duplicationHint').textContent = hint;
+
+            // AI Suggested Routing
+            populateAiRouting(dcr);
         }
 
         function showMainView() {
@@ -3753,7 +4284,6 @@
             
             renderMainTable();
             renderTriagedTable();
-            renderPendingMoreInfoTable();
             renderPendingTable();
             updatePgBadgeCount();
             renderPgTable();
@@ -3796,7 +4326,6 @@
                 // Update the tables
                 renderMainTable();
                 renderTriagedTable();
-                renderPendingMoreInfoTable();
                 renderPendingTable();
                 updatePgBadgeCount();
                 renderPgTable();
@@ -3960,15 +4489,15 @@
             const notes = document.getElementById('availabilityNotes').value;
             
             if (!status) {
-                alert('Please select an availability status.');
+                showToast('Please select an availability status.', 'warning');
                 return;
             }
 
             if (!link) {
                 if (status === 'Generally Available') {
-                    alert('Please provide a link to the documentation.');
+                    showToast('Please provide a link to the documentation.', 'warning');
                 } else {
-                    alert('Please provide an ADO item number or link.');
+                    showToast('Please provide an ADO item number or link.', 'warning');
                 }
                 return;
             }
@@ -3997,12 +4526,30 @@
             closeFeatureAvailableModal();
             renderMainTable();
             renderTriagedTable();
-            renderPendingMoreInfoTable();
+        }
+
+        // Rejection Canned Responses
+        const rejectionCannedResponses = {
+            'not-planned': 'Thank you for the request and supporting context. After review, this request is Not planned because it is not aligned with our current product strategy and planning priorities. We are closing this request and will incorporate customer feedback into future planning as priorities evolve. For early visibility into new product capabilities and upcoming roadmap updates, we recommend joining the Security Advisory Program at https://aka.ms/JoinCommunity.',
+            'insufficient-info': 'Thank you for submitting this customer request. We are closing this request as Reject because key details are missing and we cannot complete an evaluation. Please resubmit with: [missing details]. Once we have this information, we will re-review and provide a documented outcome.',
+            'workaround': 'Thank you for the request. After review, the scenario is already supported through existing product capability and/or documented guidance. As a result, we are closing this request as Reject. Recommended workaround/guidance: [insert workaround / guidance]. If this approach does not meet the customer\'s requirements, please resubmit with the specific gaps and constraints, including why the proposed workaround is insufficient.',
+            'not-feature-request': 'Thank you for the request. After review, this is not a feature/design change request. Recommended guidance and next steps: [insert guidance / next steps]. If you believe there is a net-new product gap, please resubmit as a customer request with the use case, desired outcome, and business impact.',
+            'not-planned-extended': 'Thank you for the continued partnership and the additional context shared over time. After continued review and tracking, this request is Not planned because it is not aligned with our current product strategy and investment direction. We are closing this request and will incorporate customer feedback into future planning as priorities evolve. For early visibility into new product capabilities and upcoming roadmap updates, we recommend joining the Security Advisory Program at https://aka.ms/JoinCommunity.',
+            'evidence-gathering': 'Thank you for the request. After review, this request is Not planned based on current priorities and the available evidence. We will continue to track customer demand and re-evaluate this request as additional evidence is captured. The request will remain in Evidence Gathering for visibility and demand tracking, and it will be reviewed in subsequent planning cycles. (Internal only) For ongoing visibility, please track the request in the Unified Product Insights (UPI) dashboard, where status is refreshed in alignment with planning cycles (which can occur up to quarterly).',
+            'pg-not-planned': 'Thank you for the request. This request has completed PG review. After evaluation, the request is Not planned because it does not align with our current product strategy, technical direction, or investment priorities. We are closing this request and will incorporate customer feedback into future planning as priorities evolve. For early visibility into new product capabilities and upcoming roadmap updates, we recommend joining the Security Advisory Program at https://aka.ms/JoinCommunity.'
+        };
+
+        function onRejectionReasonChange() {
+            var reason = document.getElementById('rejectionReasonSelect').value;
+            if (reason && rejectionCannedResponses[reason]) {
+                document.getElementById('rejectionNotes').value = rejectionCannedResponses[reason];
+            }
         }
 
         // Rejected Modal functions
         function openRejectedModal() {
             if (!currentDcr) return;
+            document.getElementById('rejectionReasonSelect').value = '';
             document.getElementById('rejectionNotes').value = '';
             document.getElementById('rejectedModal').classList.add('active');
         }
@@ -4015,7 +4562,7 @@
             const notes = document.getElementById('rejectionNotes').value;
             
             if (!notes.trim()) {
-                alert('Please provide rejection notes.');
+                showToast('Please provide rejection notes.', 'warning');
                 return;
             }
             
@@ -4034,7 +4581,6 @@
             closeRejectedModal();
             renderMainTable();
             renderTriagedTable();
-            renderPendingMoreInfoTable();
         }
 
         // Evidence Gathering Modal functions
@@ -4125,7 +4671,7 @@
                 const description = document.getElementById('newFeatureDescription').value;
                 
                 if (!title.trim() || !product) {
-                    alert('Please fill in the feature title and product.');
+                    showToast('Please fill in the feature title and product.', 'warning');
                     return;
                 }
                 
@@ -4142,7 +4688,7 @@
             }
             
             if (!selectedFeatureRequest) {
-                alert('Please select or create a feature request.');
+                showToast('Please select or create a feature request.', 'warning');
                 return;
             }
             
@@ -4161,7 +4707,6 @@
             closeEvidenceGatheringModal();
             renderMainTable();
             renderTriagedTable();
-            renderPendingMoreInfoTable();
         }
 
         // Close dropdowns when clicking outside
@@ -4237,12 +4782,12 @@
             const body = document.getElementById('messageBody').value;
 
             if (!subject.trim() || !body.trim()) {
-                alert('Please enter a subject and message body.');
+                showToast('Please enter a subject and message body.', 'warning');
                 return;
             }
 
             // Simulate sending message
-            alert('Message sent successfully to ' + messageDcr.requester + '!\n\nSubject: ' + subject);
+            showToast('Message sent to ' + messageDcr.requester, 'success');
             
             // Track that a message was sent
             if (messageDcr) {
@@ -4252,86 +4797,7 @@
 
             closeMessageModal();
             renderMainTable();
-            renderPendingMoreInfoTable();
             renderTriagedTable();
-        }
-
-        let addMoreInfoDcr = null;
-
-        function openAddMoreInfoModal(dcrId) {
-            addMoreInfoDcr = dcrData.find(function(d) { return d.id === dcrId; });
-            if (!addMoreInfoDcr) return;
-
-            document.getElementById('addInfoDcrId').textContent = dcrId;
-            document.getElementById('additionalInfo').value = '';
-            document.getElementById('addMoreInfoModal').classList.add('active');
-        }
-
-        function closeAddMoreInfoModal() {
-            document.getElementById('addMoreInfoModal').classList.remove('active');
-            addMoreInfoDcr = null;
-        }
-
-        function completeTriageAsAvailable() {
-            const additionalInfo = document.getElementById('additionalInfo').value;
-            
-            if (!additionalInfo.trim()) {
-                alert('Please enter the additional information.');
-                return;
-            }
-
-            if (addMoreInfoDcr) {
-                addMoreInfoDcr.additionalInfoReceived = additionalInfo;
-                addMoreInfoDcr.triageOutcome = 'Feature Available';
-                addMoreInfoDcr.availabilityStatus = 'Generally Available';
-                addMoreInfoDcr.triageDate = new Date();
-                
-                alert('Triage completed for ' + addMoreInfoDcr.id + ' - Marked as Feature Available');
-                closeAddMoreInfoModal();
-                renderPendingMoreInfoTable();
-                renderTriagedTable();
-            }
-        }
-
-        function completeTriageAsRejected() {
-            const additionalInfo = document.getElementById('additionalInfo').value;
-            
-            if (!additionalInfo.trim()) {
-                alert('Please enter the additional information.');
-                return;
-            }
-
-            if (addMoreInfoDcr) {
-                addMoreInfoDcr.additionalInfoReceived = additionalInfo;
-                addMoreInfoDcr.triageOutcome = 'Rejected';
-                addMoreInfoDcr.rejectionNotes = 'Rejected after receiving additional information.';
-                addMoreInfoDcr.triageDate = new Date();
-                
-                alert('Triage completed for ' + addMoreInfoDcr.id + ' - DCR Rejected');
-                closeAddMoreInfoModal();
-                renderPendingMoreInfoTable();
-                renderTriagedTable();
-            }
-        }
-
-        function completeTriageAsEvidenceGathering() {
-            const additionalInfo = document.getElementById('additionalInfo').value;
-            
-            if (!additionalInfo.trim()) {
-                alert('Please enter the additional information.');
-                return;
-            }
-
-            if (addMoreInfoDcr) {
-                addMoreInfoDcr.additionalInfoReceived = additionalInfo;
-                addMoreInfoDcr.triageOutcome = 'Evidence Gathering';
-                addMoreInfoDcr.triageDate = new Date();
-                
-                // Open evidence gathering modal for feature linking
-                currentDcr = addMoreInfoDcr;
-                closeAddMoreInfoModal();
-                openEvidenceGatheringModal();
-            }
         }
 
         let revertDcr = null;
@@ -4354,7 +4820,7 @@
             const justification = document.getElementById('revertJustification').value;
 
             if (!justification.trim()) {
-                alert('Please provide a justification for reverting the triage.');
+                showToast('Please provide a justification for reverting the triage.', 'warning');
                 return;
             }
 
@@ -4371,21 +4837,31 @@
                 revertDcr.revertJustification = justification;
                 revertDcr.revertDate = new Date();
 
-                alert('Triage reverted successfully for ' + revertDcr.id);
+                showToast('Triage reverted successfully for ' + revertDcr.id, 'success');
                 closeRevertTriageModal();
                 renderMainTable();
                 renderTriagedTable();
-                renderPendingMoreInfoTable();
             }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             generateDCRData();
+            initColumnToggle();
             renderMainTable();
             renderTriagedTable();
-            renderPendingMoreInfoTable();
             renderPendingTable();
             updatePgBadgeCount();
+            updateTabCounts();
+            updateHotAlertBanner();
+            applyColumnVisibility();
+            showOnboarding();
+
+            // Wire up tab buttons
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    switchTab(btn.getAttribute('data-tab'));
+                });
+            });
         });
 
         // View Switching Functions
@@ -4413,7 +4889,6 @@
                 pgTriageView.classList.remove('active');
                 renderMainTable();
                 renderTriagedTable();
-                renderPendingMoreInfoTable();
                 renderPendingTable();
             } else {
                 pgBtn.classList.add('active');
@@ -4691,12 +5166,12 @@
             const notes = document.getElementById('adoRejectionNotes').value;
             
             if (!reason) {
-                alert('Please select a rejection reason.');
+                showToast('Please select a rejection reason.', 'warning');
                 return;
             }
             
             if (!notes.trim()) {
-                alert('Please provide rejection notes.');
+                showToast('Please provide rejection notes.', 'warning');
                 return;
             }
             
@@ -4710,7 +5185,7 @@
                 currentAdoDcr.submittedToPG = false;
                 currentAdoDcr.pgRequestMoreInfo = false;
                 
-                alert('DCR ' + currentAdoDcr.id + ' has been rejected.');
+                showToast('DCR ' + currentAdoDcr.id + ' has been rejected.', 'success');
             }
             
             closeAdoRejectedModal();
@@ -4732,7 +5207,7 @@
             const infoRequested = document.getElementById('adoInfoRequested').value;
             
             if (!infoRequested.trim()) {
-                alert('Please specify what information is needed.');
+                showToast('Please specify what information is needed.', 'warning');
                 return;
             }
             
@@ -4742,7 +5217,7 @@
                 currentAdoDcr.pgInfoRequested = infoRequested;
                 currentAdoDcr.submittedToPG = false;
                 
-                alert('Information request sent to CxE for ' + currentAdoDcr.id);
+                showToast('Information request sent to CxE for ' + currentAdoDcr.id, 'success');
             }
             
             closeAdoRequestInfoModal();
@@ -4766,7 +5241,7 @@
             const notes = document.getElementById('adoAvailableNotes').value;
             
             if (!link.trim()) {
-                alert('Please provide a link to the documentation.');
+                showToast('Please provide a link to the documentation.', 'warning');
                 return;
             }
             
@@ -4782,7 +5257,7 @@
                 currentAdoDcr.submittedToPG = false;
                 currentAdoDcr.pgRequestMoreInfo = false;
                 
-                alert('DCR ' + currentAdoDcr.id + ' marked as Generally Available.');
+                showToast('DCR ' + currentAdoDcr.id + ' marked as Generally Available.', 'success');
             }
             
             closeAdoAvailableModal();
@@ -4808,12 +5283,12 @@
             const notes = document.getElementById('adoDevNotes').value;
             
             if (!phase) {
-                alert('Please select a development phase.');
+                showToast('Please select a development phase.', 'warning');
                 return;
             }
             
             if (!link.trim()) {
-                alert('Please provide an ADO item link.');
+                showToast('Please provide an ADO item link.', 'warning');
                 return;
             }
             
@@ -4828,7 +5303,7 @@
                 currentAdoDcr.submittedToPG = false;
                 currentAdoDcr.pgRequestMoreInfo = false;
                 
-                alert('DCR ' + currentAdoDcr.id + ' marked as ' + phase + '.');
+                showToast('DCR ' + currentAdoDcr.id + ' marked as ' + phase + '.', 'success');
             }
             
             closeAdoInDevModal();
@@ -4860,7 +5335,7 @@
             const notes = document.getElementById('adoBacklogNotes').value;
             
             if (!useCurrentItem && !link.trim()) {
-                alert('Please provide an ADO item link or check "Use current ADO item".');
+                showToast('Please provide an ADO item link or check "Use current ADO item".', 'warning');
                 return;
             }
             
@@ -4874,7 +5349,7 @@
                 currentAdoDcr.submittedToPG = false;
                 currentAdoDcr.pgRequestMoreInfo = false;
                 
-                alert('DCR ' + currentAdoDcr.id + ' added to backlog.');
+                showToast('DCR ' + currentAdoDcr.id + ' added to backlog.', 'success');
             }
             
             closeAdoBacklogModal();
@@ -4885,7 +5360,6 @@
         function refreshAllViews() {
             renderMainTable();
             renderTriagedTable();
-            renderPendingMoreInfoTable();
             renderPendingTable();
             updatePgBadgeCount();
             renderPgTable();
@@ -4897,14 +5371,14 @@
             
             if (!currentDcr) {
                 console.error('No currentDcr found');
-                alert('No DCR selected. Please select a DCR first.');
+                showToast('No DCR selected. Please select a DCR first.', 'error');
                 return;
             }
             
             const modalElement = document.getElementById('respondToPgModal');
             if (!modalElement) {
                 console.error('respondToPgModal element not found');
-                alert('Modal element not found in page');
+                showToast('Modal element not found in page', 'error');
                 return;
             }
             
@@ -4946,7 +5420,7 @@
             const response = document.getElementById('cxeResponseInfo').value;
             
             if (!response.trim()) {
-                alert('Please provide a response.');
+                showToast('Please provide a response.', 'warning');
                 return;
             }
             
@@ -4970,7 +5444,7 @@
                 document.getElementById('submitToPGBtn').style.display = 'none';
                 document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
                 
-                alert('✓ Additional information provided and DCR resubmitted to PG for ' + currentDcr.id);
+                showToast('Additional information provided and DCR resubmitted to PG for ' + currentDcr.id, 'success');
             }
             
             closeRespondToPgModal();
@@ -5074,12 +5548,12 @@
             const notes = document.getElementById('pgRejectionNotes').value;
             
             if (!reason) {
-                alert('Please select a rejection reason.');
+                showToast('Please select a rejection reason.', 'warning');
                 return;
             }
             
             if (!notes.trim()) {
-                alert('Please provide rejection notes.');
+                showToast('Please provide rejection notes.', 'warning');
                 return;
             }
             
@@ -5129,14 +5603,14 @@
             const status = document.getElementById('pgApprovalStatus').value;
             const link = document.getElementById('pgApprovalLink').value.trim();
             if (!status) {
-                alert('Please select a feature status.');
+                showToast('Please select a feature status.', 'warning');
                 return;
             }
             if (!link) {
                 if (status === 'Generally available') {
-                    alert('Please provide a link to the product documentation.');
+                    showToast('Please provide a link to the product documentation.', 'warning');
                 } else {
-                    alert('Please provide an ADO item number or link.');
+                    showToast('Please provide an ADO item number or link.', 'warning');
                 }
                 return;
             }
@@ -5184,8 +5658,41 @@
             updatePgDetailStatusMessage(currentPgDcr);
             updatePgBadgeCount();
             renderPgTable();
-            alert('Request for more information sent to CxE team for ' + currentPgDcr.id);
+            showToast('Request for more information sent to CxE team for ' + currentPgDcr.id, 'success');
         }
     </script>
+
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Onboarding Overlay -->
+    <div class="onboarding-overlay" id="onboardingOverlay">
+        <div class="onboarding-card">
+            <h2>Welcome to DCR Triage</h2>
+            <p class="subtitle">Manage and triage Design Change Requests across Microsoft Security products</p>
+            <div class="onboarding-steps">
+                <div class="onboarding-step">
+                    <div class="onboarding-step-num">1</div>
+                    <div class="onboarding-step-text"><strong>Review the queue</strong> — Hot and critical items are pinned to the top. Use search and filters to find specific DCRs.</div>
+                </div>
+                <div class="onboarding-step">
+                    <div class="onboarding-step-num">2</div>
+                    <div class="onboarding-step-text"><strong>Open a DCR</strong> — Click any row to see full details and AI-powered insights from the Triage Copilot.</div>
+                </div>
+                <div class="onboarding-step">
+                    <div class="onboarding-step-num">3</div>
+                    <div class="onboarding-step-text"><strong>Triage it</strong> — Mark as available, reject, gather evidence, or submit to the Product Group for review.</div>
+                </div>
+                <div class="onboarding-step">
+                    <div class="onboarding-step-num">4</div>
+                    <div class="onboarding-step-text"><strong>Track progress</strong> — Switch tabs to see pending PG responses, triaged DCRs, and items awaiting info.</div>
+                </div>
+            </div>
+            <button class="btn btn-primary" style="width:100%; padding:12px; font-size:15px;" onclick="dismissOnboarding()">Get Started</button>
+            <label style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:12px; font-size:13px; color:#6b7280; cursor:pointer;">
+                <input type="checkbox" id="dontShowAgain"> Don't show this again
+            </label>
+        </div>
+    </div>
 </body>
 </html>

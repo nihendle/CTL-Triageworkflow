@@ -2173,6 +2173,7 @@
                                     <thead>
                                         <tr>
                                             <th>DCR ID</th>
+                                            <th>Feature ID</th>
                                             <th>Product Name</th>
                                             <th>Product Group</th>
                                             <th>Feature Area</th>
@@ -2256,6 +2257,7 @@
                             <thead>
                                 <tr>
                                     <th>DCR ID</th>
+                                    <th>Feature ID</th>
                                     <th>Product Name</th>
                                     <th>Feature Area</th>
                                     <th>Submitted Date</th>
@@ -2921,7 +2923,7 @@
                                     <line x1="12" y1="18" x2="12" y2="12"></line>
                                     <line x1="9" y1="15" x2="15" y2="15"></line>
                                 </svg>
-                                Evidence Gathering
+                                CxE Evidence Gathering
                             </button>
                         </div>
                         <div class="status-message" id="detailStatusMessage">
@@ -3123,25 +3125,61 @@
                     </div>
                 </div>
                 <div class="divider-with-text">
-                    <span>OR SELECT MANUALLY</span>
+                    <span>OR SELECT FROM ALL FEATURES</span>
                 </div>
                 <div class="form-group">
-                    <label for="availabilityStatus">Availability Status</label>
-                    <select id="availabilityStatus" onchange="updateAvailabilityLinkField()">
-                        <option value="">-- Select Availability Status --</option>
-                        <option value="Generally Available">Generally Available</option>
-                        <option value="Public Preview">Public Preview</option>
-                        <option value="Private Preview">Private Preview</option>
-                        <option value="Island Preview">Island Preview</option>
-                    </select>
+                    <label for="availableFeatureSearch">Connect to Existing Feature</label>
+                    <div class="search-select-container">
+                        <input type="text" id="availableFeatureSearch" class="form-input" placeholder="Search all feature requests..." oninput="filterAvailableFeatureRequests()" onfocus="showAvailableFeatureDropdown()">
+                        <div class="search-dropdown" id="availableFeatureDropdown">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="availableSelectedFeatureDisplay" style="display: none;">
+                    <label>Selected Feature Request</label>
+                    <div class="selected-feature-tag">
+                        <span id="availableSelectedFeatureText"></span>
+                        <button class="remove-feature-btn" onclick="clearAvailableSelectedFeature()">&times;</button>
+                    </div>
+                </div>
+                <div class="divider-with-text">
+                    <span>OR CREATE NEW FEATURE REQUEST</span>
                 </div>
                 <div class="form-group">
-                    <label id="availabilityLinkLabel" for="availabilityLink">Link</label>
-                    <input id="availabilityLink" class="form-input" type="text" placeholder="Add supporting link" />
+                    <button class="btn btn-secondary full-width" id="availableCreateFeatureToggleBtn" onclick="showAvailableCreateFeatureForm()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Create New Feature Request
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="availabilityNotes">Additional Information</label>
-                    <textarea id="availabilityNotes" class="form-textarea" placeholder="Enter additional details about the feature availability..." rows="4"></textarea>
+                <div id="availableCreateFeatureForm" style="display: none;">
+                    <div class="new-feature-form">
+                        <h4>New Feature Request</h4>
+                        <div class="form-group">
+                            <label for="availableNewFeatureTitle">Feature Title</label>
+                            <input type="text" id="availableNewFeatureTitle" class="form-input" placeholder="Enter feature title...">
+                        </div>
+                        <div class="form-group">
+                            <label for="availabilityStatus">Availability Status</label>
+                            <select id="availabilityStatus" onchange="updateAvailabilityLinkField()">
+                                <option value="">-- Select Availability Status --</option>
+                                <option value="Generally Available">Generally Available</option>
+                                <option value="Public Preview">Public Preview</option>
+                                <option value="Private Preview">Private Preview</option>
+                                <option value="Island Preview">Island Preview</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label id="availabilityLinkLabel" for="availabilityLink">Availability Link</label>
+                            <input id="availabilityLink" class="form-input" type="text" placeholder="Add supporting link" />
+                        </div>
+                        <div class="form-group">
+                            <label for="availabilityNotes">Additional Information</label>
+                            <textarea id="availabilityNotes" class="form-textarea" placeholder="Enter additional details about the feature availability..." rows="4"></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -3171,6 +3209,56 @@
                         <option value="evidence-gathering">Reject – Not planned – Re-evaluate based on additional customer demand (Evidence Gathering)</option>
                         <option value="pg-not-planned">PG reviewed – Not planned</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="rejectionFeatureSearch">Connect to Feature Request</label>
+                    <div class="search-select-container">
+                        <input type="text" id="rejectionFeatureSearch" class="form-input" placeholder="Search for feature requests..." oninput="filterRejectionFeatureRequests()" onfocus="showRejectionFeatureDropdown()">
+                        <div class="search-dropdown" id="rejectionFeatureDropdown">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" id="rejectionSelectedFeatureDisplay" style="display: none;">
+                    <label>Selected Feature Request</label>
+                    <div class="selected-feature-tag">
+                        <span id="rejectionSelectedFeatureText"></span>
+                        <button class="remove-feature-btn" onclick="clearRejectionSelectedFeature()">&times;</button>
+                    </div>
+                </div>
+                <div class="divider-with-text">
+                    <span>OR</span>
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-secondary full-width" onclick="showRejectionCreateFeatureForm()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Create New Feature Request
+                    </button>
+                </div>
+                <div id="rejectionCreateFeatureForm" style="display: none;">
+                    <div class="new-feature-form">
+                        <h4>New Feature Request</h4>
+                        <div class="form-group">
+                            <label for="rejectionNewFeatureTitle">Feature Title</label>
+                            <input type="text" id="rejectionNewFeatureTitle" class="form-input" placeholder="Enter feature title...">
+                        </div>
+                        <div class="form-group">
+                            <label for="rejectionNewFeatureProduct">Product</label>
+                            <select id="rejectionNewFeatureProduct" class="form-select">
+                                <option value="">-- Select Product --</option>
+                                <option value="Defender for Identity">Defender for Identity</option>
+                                <option value="Defender for Endpoint">Defender for Endpoint</option>
+                                <option value="Sentinel">Sentinel</option>
+                                <option value="Defender 365">Defender 365</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="rejectionNewFeatureDescription">Description</label>
+                            <textarea id="rejectionNewFeatureDescription" class="form-textarea" placeholder="Describe the feature request..." rows="3"></textarea>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="rejectionNotes">Rejection Notes</label>
@@ -3235,11 +3323,11 @@
         </div>
     </div>
 
-    <!-- Evidence Gathering Modal -->
+    <!-- CxE Evidence Gathering Modal -->
     <div class="modal-overlay" id="evidenceGatheringModal">
         <div class="modal">
             <div class="modal-header">
-                <h3>Evidence Gathering</h3>
+                <h3>CxE Evidence Gathering</h3>
                 <button class="modal-close" onclick="closeEvidenceGatheringModal()">&times;</button>
             </div>
             <div class="modal-body">
@@ -3796,7 +3884,7 @@
                 
                 const description = descriptions[Math.floor(Math.random() * descriptions.length)];
                 dcrData.push({
-                    id: 'DCR-' + String(1000 + i).padStart(4, '0'),
+                    id: 'DCR-M365-' + String(1000 + i).padStart(4, '0'),
                     title: description,
                     product: product,
                     productArea: productAreas[Math.floor(Math.random() * productAreas.length)],
@@ -4003,6 +4091,7 @@
             pending.forEach(function(dcr) {
                 const row = document.createElement('tr');
                 row.innerHTML = '<td><span class="dcr-id" onclick="showDetailView(\'' + dcr.id + '\')">' + dcr.id + '</span></td>' +
+                    '<td>' + (dcr.featureId || '-') + '</td>' +
                     '<td>' + dcr.product + '</td>' +
                     '<td>' + dcr.submittedProductGroup + '</td>' +
                     '<td>' + dcr.submittedFeatureArea + '</td>' +
@@ -4087,7 +4176,8 @@
                 }
                 statusMessage.className = 'status-message success';
                 const linkHtml = getAdoLinkHtml(dcr.id);
-                document.getElementById('detailStatusText').innerHTML = 'Submitted to ' + dcr.submittedProductGroup + ' - ' + dcr.submittedFeatureArea + ' on ' + formatDate(dcr.submittedDate) + '&nbsp;&bull;&nbsp;' + linkHtml;
+                let featureIdHtml = dcr.featureId ? '&nbsp;&bull;&nbsp;Feature ID: <strong>' + dcr.featureId + '</strong>' : '';
+                document.getElementById('detailStatusText').innerHTML = 'Submitted to ' + dcr.submittedProductGroup + ' - ' + dcr.submittedFeatureArea + ' on ' + formatDate(dcr.submittedDate) + featureIdHtml + '&nbsp;&bull;&nbsp;' + linkHtml;
                 document.getElementById('submitToPGBtn').style.display = 'none';
                 document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
             } else {
@@ -4262,6 +4352,10 @@
             document.getElementById('backBtn').style.display = 'none';
         }
 
+        function generateFeatureId() {
+            return 'MFR-M365-' + String(Math.floor(1000 + Math.random() * 9000));
+        }
+
         function submitToPG() {
             const productGroup = document.getElementById('productGroupSelect').value;
             const featureArea = document.getElementById('featureAreaSelect').value;
@@ -4276,6 +4370,9 @@
                 dcr.submittedDate = new Date();
                 if (!dcr.adoId) {
                     dcr.adoId = generateAdoId();
+                }
+                if (!dcr.featureId) {
+                    dcr.featureId = generateFeatureId();
                 }
                 dcr.adoStatus = 'Pending Review';
             }
@@ -4292,7 +4389,7 @@
                 const statusMessage = document.getElementById('detailStatusMessage');
                 statusMessage.className = 'status-message success';
                 const linkHtml = getAdoLinkHtml(currentDcr.id);
-                document.getElementById('detailStatusText').innerHTML = 'Submitted to ' + productGroup + ' - ' + featureArea + ' on ' + formatDate(new Date()) + '&nbsp;&bull;&nbsp;' + linkHtml;
+                document.getElementById('detailStatusText').innerHTML = 'Submitted to ' + productGroup + ' - ' + featureArea + ' on ' + formatDate(new Date()) + '&nbsp;&bull;&nbsp;Feature ID: <strong>' + dcr.featureId + '</strong>&nbsp;&bull;&nbsp;' + linkHtml;
                 document.getElementById('submitToPGBtn').style.display = 'none';
                 document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
             }
@@ -4309,6 +4406,7 @@
                 dcr.submittedDate = null;
                 dcr.adoId = null;
                 dcr.adoStatus = null;
+                dcr.featureId = null;
                 dcr.pgTriageOutcome = null;
                 dcr.pgRequestMoreInfo = false;
                 dcr.pgInfoRequested = null;
@@ -4335,29 +4433,29 @@
         // Feature Requests data for Evidence Gathering
         const existingFeatureRequests = [
             // Microsoft Defender for Identity
-            { id: 'FR-001', title: 'Enhanced hybrid identity attack path visualization across on-prem AD and Entra ID', product: 'Defender for Identity', status: 'In Review', availability: 'Private Preview' },
-            { id: 'FR-002', title: 'Custom detection rules for identity reconnaissance with configurable thresholds', product: 'Defender for Identity', status: 'Approved', availability: 'Generally Available' },
-            { id: 'FR-003', title: 'Improved baselining of service account behavior to reduce false positives', product: 'Defender for Identity', status: 'In Progress', availability: 'Public Preview' },
-            { id: 'FR-004', title: 'Real time credential theft alerting with optional automated response actions', product: 'Defender for Identity', status: 'Approved', availability: 'Generally Available' },
-            { id: 'FR-005', title: 'Identity security posture scoring broken down by domain or forest', product: 'Defender for Identity', status: 'In Review', availability: 'Private Preview' },
+            { id: 'MFR-M365-0001', title: 'Enhanced hybrid identity attack path visualization across on-prem AD and Entra ID', product: 'Defender for Identity', status: 'In Review', availability: 'Private Preview' },
+            { id: 'MFR-M365-0002', title: 'Custom detection rules for identity reconnaissance with configurable thresholds', product: 'Defender for Identity', status: 'Approved', availability: 'Generally Available' },
+            { id: 'MFR-M365-0003', title: 'Improved baselining of service account behavior to reduce false positives', product: 'Defender for Identity', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'MFR-M365-0004', title: 'Real time credential theft alerting with optional automated response actions', product: 'Defender for Identity', status: 'Approved', availability: 'Generally Available' },
+            { id: 'MFR-M365-0005', title: 'Identity security posture scoring broken down by domain or forest', product: 'Defender for Identity', status: 'In Review', availability: 'Private Preview' },
             // Microsoft Defender for Endpoint
-            { id: 'FR-006', title: 'Granular USB device control policies scoped by user group or device risk level', product: 'Defender for Endpoint', status: 'Approved', availability: 'Generally Available' },
-            { id: 'FR-007', title: 'Attack Surface Reduction rule simulation mode showing pre-deployment impact', product: 'Defender for Endpoint', status: 'In Progress', availability: 'Public Preview' },
-            { id: 'FR-008', title: 'Automatic correlation of related EDR alerts across multiple endpoints', product: 'Defender for Endpoint', status: 'Approved', availability: 'Generally Available' },
-            { id: 'FR-009', title: 'Device group scoped malware detection exclusions', product: 'Defender for Endpoint', status: 'In Review', availability: 'Private Preview' },
-            { id: 'FR-010', title: 'Offline investigation and response actions that execute when endpoints reconnect', product: 'Defender for Endpoint', status: 'In Progress', availability: 'Island Preview' },
+            { id: 'MFR-M365-0006', title: 'Granular USB device control policies scoped by user group or device risk level', product: 'Defender for Endpoint', status: 'Approved', availability: 'Generally Available' },
+            { id: 'MFR-M365-0007', title: 'Attack Surface Reduction rule simulation mode showing pre-deployment impact', product: 'Defender for Endpoint', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'MFR-M365-0008', title: 'Automatic correlation of related EDR alerts across multiple endpoints', product: 'Defender for Endpoint', status: 'Approved', availability: 'Generally Available' },
+            { id: 'MFR-M365-0009', title: 'Device group scoped malware detection exclusions', product: 'Defender for Endpoint', status: 'In Review', availability: 'Private Preview' },
+            { id: 'MFR-M365-0010', title: 'Offline investigation and response actions that execute when endpoints reconnect', product: 'Defender for Endpoint', status: 'In Progress', availability: 'Island Preview' },
             // Microsoft Sentinel
-            { id: 'FR-011', title: 'Log ingestion cost forecasting and what-if analysis before onboarding data sources', product: 'Sentinel', status: 'Approved', availability: 'Generally Available' },
-            { id: 'FR-012', title: 'Native multi-tenant SOC view for MSSPs managing multiple customers', product: 'Sentinel', status: 'In Progress', availability: 'Public Preview' },
-            { id: 'FR-013', title: 'Increased transparency for UEBA analytics with contributing signals and confidence scores', product: 'Sentinel', status: 'In Review', availability: 'Private Preview' },
-            { id: 'FR-014', title: 'One click safe testing mode for SOAR playbooks without impacting production', product: 'Sentinel', status: 'Approved', availability: 'Generally Available' },
-            { id: 'FR-015', title: 'Industry specific advanced threat hunting templates', product: 'Sentinel', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'MFR-M365-0011', title: 'Log ingestion cost forecasting and what-if analysis before onboarding data sources', product: 'Sentinel', status: 'Approved', availability: 'Generally Available' },
+            { id: 'MFR-M365-0012', title: 'Native multi-tenant SOC view for MSSPs managing multiple customers', product: 'Sentinel', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'MFR-M365-0013', title: 'Increased transparency for UEBA analytics with contributing signals and confidence scores', product: 'Sentinel', status: 'In Review', availability: 'Private Preview' },
+            { id: 'MFR-M365-0014', title: 'One click safe testing mode for SOAR playbooks without impacting production', product: 'Sentinel', status: 'Approved', availability: 'Generally Available' },
+            { id: 'MFR-M365-0015', title: 'Industry specific advanced threat hunting templates', product: 'Sentinel', status: 'In Progress', availability: 'Public Preview' },
             // Microsoft Defender 365
-            { id: 'FR-016', title: 'Unified incident severity scoring across identity, endpoint, email, and cloud signals', product: 'Defender 365', status: 'Approved', availability: 'Generally Available' },
-            { id: 'FR-017', title: 'End to end attack chain visualization across Microsoft security products', product: 'Defender 365', status: 'In Progress', availability: 'Public Preview' },
-            { id: 'FR-018', title: 'Customizable analyst investigation workflow dashboards', product: 'Defender 365', status: 'Approved', availability: 'Generally Available' },
-            { id: 'FR-019', title: 'Adaptive alert noise reduction based on customer resolution history', product: 'Defender 365', status: 'In Review', availability: 'Private Preview' },
-            { id: 'FR-020', title: 'Executive ready security posture summaries for leadership reporting', product: 'Defender 365', status: 'In Progress', availability: 'Public Preview' }
+            { id: 'MFR-M365-0016', title: 'Unified incident severity scoring across identity, endpoint, email, and cloud signals', product: 'Defender 365', status: 'Approved', availability: 'Generally Available' },
+            { id: 'MFR-M365-0017', title: 'End to end attack chain visualization across Microsoft security products', product: 'Defender 365', status: 'In Progress', availability: 'Public Preview' },
+            { id: 'MFR-M365-0018', title: 'Customizable analyst investigation workflow dashboards', product: 'Defender 365', status: 'Approved', availability: 'Generally Available' },
+            { id: 'MFR-M365-0019', title: 'Adaptive alert noise reduction based on customer resolution history', product: 'Defender 365', status: 'In Review', availability: 'Private Preview' },
+            { id: 'MFR-M365-0020', title: 'Executive ready security posture summaries for leadership reporting', product: 'Defender 365', status: 'In Progress', availability: 'Public Preview' }
         ];
 
         // AI summaries for different feature areas
@@ -4389,6 +4487,9 @@
         let adoBackView = 'cxe';
 
         // Feature Already Available Modal functions
+        let availableSelectedFeature = null;
+        let availableIsCreatingNewFeature = false;
+
         function openFeatureAvailableModal() {
             if (!currentDcr) return;
             document.getElementById('availabilityStatus').value = '';
@@ -4396,23 +4497,37 @@
             document.getElementById('availabilityLink').value = '';
             updateAvailabilityLinkField();
             selectedRecommendedFeature = null;
+            availableSelectedFeature = null;
+            availableIsCreatingNewFeature = false;
+            document.getElementById('availableFeatureSearch').value = '';
+            document.getElementById('availableSelectedFeatureDisplay').style.display = 'none';
+            document.getElementById('availableCreateFeatureForm').style.display = 'none';
+            document.getElementById('availableCreateFeatureToggleBtn').style.display = '';
             
             // Populate recommended features
             populateRecommendedFeatures(currentDcr);
+            populateAvailableFeatureDropdown(existingFeatureRequests);
             
             document.getElementById('featureAvailableModal').classList.add('active');
         }
         
         function openFeatureAvailableModalWithFeature(feature) {
             if (!currentDcr) return;
-            document.getElementById('availabilityStatus').value = feature.availability || '';
-            document.getElementById('availabilityNotes').value = 'Mapped to existing feature: ' + feature.id + ' - ' + feature.title;
+            selectedRecommendedFeature = feature;
+            availableSelectedFeature = null;
+            availableIsCreatingNewFeature = false;
+            document.getElementById('availableFeatureSearch').value = '';
+            document.getElementById('availableSelectedFeatureDisplay').style.display = 'none';
+            document.getElementById('availableCreateFeatureForm').style.display = 'none';
+            document.getElementById('availableCreateFeatureToggleBtn').style.display = '';
+            document.getElementById('availabilityStatus').value = '';
+            document.getElementById('availabilityNotes').value = '';
             document.getElementById('availabilityLink').value = '';
             updateAvailabilityLinkField();
-            selectedRecommendedFeature = feature;
             
             // Populate recommended features
             populateRecommendedFeatures(currentDcr);
+            populateAvailableFeatureDropdown(existingFeatureRequests);
             
             // Pre-select the feature
             setTimeout(function() {
@@ -4425,6 +4540,71 @@
             }, 0);
             
             document.getElementById('featureAvailableModal').classList.add('active');
+        }
+
+        function populateAvailableFeatureDropdown(features) {
+            const dropdown = document.getElementById('availableFeatureDropdown');
+            dropdown.innerHTML = '';
+            if (features.length === 0) {
+                dropdown.innerHTML = '<div class="search-dropdown-empty">No matching feature requests found</div>';
+                return;
+            }
+            features.forEach(function(fr) {
+                const item = document.createElement('div');
+                item.className = 'search-dropdown-item';
+                item.innerHTML = '<div class="item-title">' + fr.id + ': ' + fr.title + '</div>' +
+                    '<div class="item-meta">' + fr.product + ' • ' + fr.availability + '</div>';
+                item.onclick = function() { selectAvailableFeature(fr); };
+                dropdown.appendChild(item);
+            });
+        }
+
+        function showAvailableFeatureDropdown() {
+            document.getElementById('availableFeatureDropdown').classList.add('active');
+        }
+
+        function filterAvailableFeatureRequests() {
+            const searchTerm = document.getElementById('availableFeatureSearch').value.toLowerCase();
+            const filtered = existingFeatureRequests.filter(function(fr) {
+                return fr.title.toLowerCase().includes(searchTerm) ||
+                       fr.id.toLowerCase().includes(searchTerm) ||
+                       fr.product.toLowerCase().includes(searchTerm);
+            });
+            populateAvailableFeatureDropdown(filtered);
+            document.getElementById('availableFeatureDropdown').classList.add('active');
+        }
+
+        function selectAvailableFeature(fr) {
+            availableSelectedFeature = fr;
+            selectedRecommendedFeature = null;
+            availableIsCreatingNewFeature = false;
+            document.getElementById('availableFeatureSearch').value = '';
+            document.getElementById('availableFeatureDropdown').classList.remove('active');
+            document.getElementById('availableSelectedFeatureDisplay').style.display = 'block';
+            document.getElementById('availableSelectedFeatureText').textContent = fr.id + ': ' + fr.title;
+            document.getElementById('availableCreateFeatureForm').style.display = 'none';
+            // Deselect recommended features
+            document.querySelectorAll('.recommended-feature-item').forEach(function(item) {
+                item.classList.remove('selected');
+            });
+        }
+
+        function clearAvailableSelectedFeature() {
+            availableSelectedFeature = null;
+            document.getElementById('availableSelectedFeatureDisplay').style.display = 'none';
+        }
+
+        function showAvailableCreateFeatureForm() {
+            availableIsCreatingNewFeature = true;
+            availableSelectedFeature = null;
+            selectedRecommendedFeature = null;
+            document.getElementById('availableSelectedFeatureDisplay').style.display = 'none';
+            document.getElementById('availableCreateFeatureForm').style.display = 'block';
+            document.getElementById('availableCreateFeatureToggleBtn').style.display = 'none';
+            // Deselect recommended features
+            document.querySelectorAll('.recommended-feature-item').forEach(function(item) {
+                item.classList.remove('selected');
+            });
         }
         
         function populateRecommendedFeatures(dcr) {
@@ -4456,11 +4636,11 @@
             // Add selection to clicked item
             element.classList.add('selected');
             selectedRecommendedFeature = feature;
-            
-            // Update form fields
-            document.getElementById('availabilityStatus').value = feature.availability || '';
-            document.getElementById('availabilityNotes').value = 'Mapped to existing feature: ' + feature.id + ' - ' + feature.title;
-            updateAvailabilityLinkField();
+            availableSelectedFeature = null;
+            availableIsCreatingNewFeature = false;
+            document.getElementById('availableSelectedFeatureDisplay').style.display = 'none';
+            document.getElementById('availableCreateFeatureForm').style.display = 'none';
+            document.getElementById('availableCreateFeatureToggleBtn').style.display = '';
         }
 
         function updateAvailabilityLinkField() {
@@ -4481,48 +4661,89 @@
 
         function closeFeatureAvailableModal() {
             document.getElementById('featureAvailableModal').classList.remove('active');
+            document.getElementById('availableFeatureDropdown').classList.remove('active');
         }
 
         function submitFeatureAvailable() {
-            const status = document.getElementById('availabilityStatus').value;
-            const link = document.getElementById('availabilityLink').value.trim();
-            const notes = document.getElementById('availabilityNotes').value;
-            
-            if (!status) {
-                showToast('Please select an availability status.', 'warning');
-                return;
-            }
+            let linkedFeature = null;
 
-            if (!link) {
-                if (status === 'Generally Available') {
-                    showToast('Please provide a link to the documentation.', 'warning');
-                } else {
-                    showToast('Please provide an ADO item number or link.', 'warning');
+            // Path 1: Copilot recommended feature selected
+            if (selectedRecommendedFeature) {
+                linkedFeature = selectedRecommendedFeature;
+            }
+            // Path 2: Dropdown feature selected
+            else if (availableSelectedFeature) {
+                linkedFeature = availableSelectedFeature;
+            }
+            // Path 3: Creating new feature
+            else if (availableIsCreatingNewFeature) {
+                const title = (document.getElementById('availableNewFeatureTitle').value || '').trim();
+                const status = document.getElementById('availabilityStatus').value;
+                const link = (document.getElementById('availabilityLink').value || '').trim();
+                const notes = document.getElementById('availabilityNotes').value;
+
+                if (!title) {
+                    showToast('Please enter a feature title.', 'warning');
+                    return;
                 }
+                if (!status) {
+                    showToast('Please select an availability status.', 'warning');
+                    return;
+                }
+                if (!link) {
+                    showToast('Please provide an availability link.', 'warning');
+                    return;
+                }
+
+                const newFR = {
+                    id: 'MFR-M365-' + String(Math.floor(1000 + Math.random() * 9000)),
+                    title: title,
+                    product: currentDcr ? currentDcr.product : '',
+                    status: 'New',
+                    availability: status
+                };
+                existingFeatureRequests.push(newFR);
+                linkedFeature = newFR;
+
+                if (currentDcr) {
+                    currentDcr.availabilityStatus = status;
+                    currentDcr.availabilityLink = link;
+                    currentDcr.availabilityNotes = notes;
+                }
+            }
+            else {
+                showToast('Please select an existing feature or create a new one.', 'warning');
                 return;
             }
             
             if (currentDcr) {
                 currentDcr.triageOutcome = 'Feature Available';
-                currentDcr.availabilityStatus = status;
-                currentDcr.availabilityNotes = notes;
-                currentDcr.availabilityLink = link;
                 currentDcr.triageDate = new Date();
-                currentDcr.mappedFeature = selectedRecommendedFeature;
+                currentDcr.mappedFeature = linkedFeature;
+                if (!currentDcr.availabilityStatus && linkedFeature.availability) {
+                    currentDcr.availabilityStatus = linkedFeature.availability;
+                }
                 
                 const statusMessage = document.getElementById('detailStatusMessage');
                 statusMessage.className = 'status-message success';
                 
-                let statusText = 'Marked as Feature Already Available (' + status + ')';
-                if (selectedRecommendedFeature) {
-                    statusText += ' - Mapped to ' + selectedRecommendedFeature.id;
+                let statusText = 'Marked as Feature Already Available';
+                if (currentDcr.availabilityStatus) {
+                    statusText += ' (' + currentDcr.availabilityStatus + ')';
                 }
+                statusText += ' — Mapped to ' + linkedFeature.id + ': ' + linkedFeature.title;
                 statusText += ' on ' + formatDate(new Date());
-                const linkHtml = ' <a href="' + link + '" target="_blank" rel="noopener" style="color:#059669; text-decoration:underline;">View</a>';
-                document.getElementById('detailStatusText').innerHTML = statusText + ' (' + linkHtml + ')';
+                if (currentDcr.availabilityLink) {
+                    const linkHtml = ' <a href="' + currentDcr.availabilityLink + '" target="_blank" rel="noopener" style="color:#059669; text-decoration:underline;">View</a>';
+                    document.getElementById('detailStatusText').innerHTML = statusText + ' (' + linkHtml + ')';
+                } else {
+                    document.getElementById('detailStatusText').textContent = statusText;
+                }
             }
             
             selectedRecommendedFeature = null;
+            availableSelectedFeature = null;
+            availableIsCreatingNewFeature = false;
             closeFeatureAvailableModal();
             renderMainTable();
             renderTriagedTable();
@@ -4547,15 +4768,85 @@
         }
 
         // Rejected Modal functions
+        let rejectionSelectedFeature = null;
+        let rejectionIsCreatingNewFeature = false;
+
         function openRejectedModal() {
             if (!currentDcr) return;
             document.getElementById('rejectionReasonSelect').value = '';
             document.getElementById('rejectionNotes').value = '';
+            document.getElementById('rejectionFeatureSearch').value = '';
+            document.getElementById('rejectionSelectedFeatureDisplay').style.display = 'none';
+            document.getElementById('rejectionCreateFeatureForm').style.display = 'none';
+            rejectionSelectedFeature = null;
+            rejectionIsCreatingNewFeature = false;
+            if (currentDcr) {
+                document.getElementById('rejectionNewFeatureProduct').value = currentDcr.product;
+            }
+            populateRejectionFeatureDropdown(existingFeatureRequests);
             document.getElementById('rejectedModal').classList.add('active');
         }
 
         function closeRejectedModal() {
             document.getElementById('rejectedModal').classList.remove('active');
+            document.getElementById('rejectionFeatureDropdown').classList.remove('active');
+        }
+
+        function populateRejectionFeatureDropdown(features) {
+            const dropdown = document.getElementById('rejectionFeatureDropdown');
+            dropdown.innerHTML = '';
+            if (features.length === 0) {
+                dropdown.innerHTML = '<div class="search-dropdown-empty">No matching feature requests found</div>';
+                return;
+            }
+            features.forEach(function(fr) {
+                const item = document.createElement('div');
+                item.className = 'search-dropdown-item';
+                item.innerHTML = '<div class="item-title">' + fr.id + ': ' + fr.title + '</div>' +
+                    '<div class="item-meta">' + fr.product + ' • ' + fr.status + '</div>';
+                item.onclick = function() { selectRejectionFeature(fr); };
+                dropdown.appendChild(item);
+            });
+        }
+
+        function showRejectionFeatureDropdown() {
+            document.getElementById('rejectionFeatureDropdown').classList.add('active');
+        }
+
+        function filterRejectionFeatureRequests() {
+            const searchTerm = document.getElementById('rejectionFeatureSearch').value.toLowerCase();
+            const filtered = existingFeatureRequests.filter(function(fr) {
+                return fr.title.toLowerCase().includes(searchTerm) ||
+                       fr.id.toLowerCase().includes(searchTerm) ||
+                       fr.product.toLowerCase().includes(searchTerm);
+            });
+            populateRejectionFeatureDropdown(filtered);
+            document.getElementById('rejectionFeatureDropdown').classList.add('active');
+        }
+
+        function selectRejectionFeature(fr) {
+            rejectionSelectedFeature = fr;
+            rejectionIsCreatingNewFeature = false;
+            document.getElementById('rejectionFeatureSearch').value = '';
+            document.getElementById('rejectionFeatureDropdown').classList.remove('active');
+            document.getElementById('rejectionSelectedFeatureDisplay').style.display = 'block';
+            document.getElementById('rejectionSelectedFeatureText').textContent = fr.id + ': ' + fr.title;
+            document.getElementById('rejectionCreateFeatureForm').style.display = 'none';
+        }
+
+        function clearRejectionSelectedFeature() {
+            rejectionSelectedFeature = null;
+            document.getElementById('rejectionSelectedFeatureDisplay').style.display = 'none';
+        }
+
+        function showRejectionCreateFeatureForm() {
+            rejectionIsCreatingNewFeature = true;
+            rejectionSelectedFeature = null;
+            document.getElementById('rejectionSelectedFeatureDisplay').style.display = 'none';
+            document.getElementById('rejectionCreateFeatureForm').style.display = 'block';
+            if (currentDcr) {
+                document.getElementById('rejectionNewFeatureProduct').value = currentDcr.product;
+            }
         }
 
         function submitRejected() {
@@ -4565,19 +4856,46 @@
                 showToast('Please provide rejection notes.', 'warning');
                 return;
             }
+
+            // Handle new feature creation if form is active
+            if (rejectionIsCreatingNewFeature) {
+                const title = document.getElementById('rejectionNewFeatureTitle').value;
+                const product = document.getElementById('rejectionNewFeatureProduct').value;
+                const description = document.getElementById('rejectionNewFeatureDescription').value;
+                if (title.trim() && product) {
+                    const newFR = {
+                        id: 'MFR-M365-' + String(Math.floor(1000 + Math.random() * 9000)),
+                        title: title,
+                        product: product,
+                        status: 'New',
+                        description: description
+                    };
+                    existingFeatureRequests.push(newFR);
+                    rejectionSelectedFeature = newFR;
+                }
+            }
             
             if (currentDcr) {
                 currentDcr.triageOutcome = 'Rejected';
                 currentDcr.rejectionNotes = notes;
                 currentDcr.triageDate = new Date();
+                if (rejectionSelectedFeature) {
+                    currentDcr.linkedFeatureRequest = rejectionSelectedFeature;
+                }
                 
                 const statusMessage = document.getElementById('detailStatusMessage');
                 statusMessage.className = 'status-message success';
                 statusMessage.style.background = '#fee2e2';
                 statusMessage.style.color = '#dc2626';
-                document.getElementById('detailStatusText').textContent = 'DCR Rejected on ' + formatDate(new Date());
+                let statusText = 'DCR Rejected on ' + formatDate(new Date());
+                if (rejectionSelectedFeature) {
+                    statusText += ' — Linked to ' + rejectionSelectedFeature.id + ': ' + rejectionSelectedFeature.title;
+                }
+                document.getElementById('detailStatusText').textContent = statusText;
             }
             
+            rejectionSelectedFeature = null;
+            rejectionIsCreatingNewFeature = false;
             closeRejectedModal();
             renderMainTable();
             renderTriagedTable();
@@ -4677,7 +4995,7 @@
                 
                 // Create new feature request
                 const newFR = {
-                    id: 'FR-' + String(existingFeatureRequests.length + 1).padStart(3, '0'),
+                    id: 'MFR-M365-' + String(Math.floor(1000 + Math.random() * 9000)),
                     title: title,
                     product: product,
                     status: 'New',
@@ -4715,6 +5033,16 @@
             const searchInput = document.getElementById('featureRequestSearch');
             if (dropdown && searchInput && !dropdown.contains(event.target) && event.target !== searchInput) {
                 dropdown.classList.remove('active');
+            }
+            const rejDropdown = document.getElementById('rejectionFeatureDropdown');
+            const rejSearchInput = document.getElementById('rejectionFeatureSearch');
+            if (rejDropdown && rejSearchInput && !rejDropdown.contains(event.target) && event.target !== rejSearchInput) {
+                rejDropdown.classList.remove('active');
+            }
+            const availDropdown = document.getElementById('availableFeatureDropdown');
+            const availSearchInput = document.getElementById('availableFeatureSearch');
+            if (availDropdown && availSearchInput && !availDropdown.contains(event.target) && event.target !== availSearchInput) {
+                availDropdown.classList.remove('active');
             }
         });
 
@@ -4940,6 +5268,7 @@
                 }
                 
                 row.innerHTML = '<td><span class="dcr-id">' + dcr.id + '</span></td>' +
+                    '<td>' + (dcr.featureId || '-') + '</td>' +
                     '<td>' + dcr.product + '</td>' +
                     '<td>' + dcr.submittedFeatureArea + '</td>' +
                     '<td>' + formatDate(dcr.submittedDate) + '</td>' +
@@ -5439,8 +5768,9 @@
                 statusMessage.style.cursor = 'default';
                 statusMessage.onclick = null;
                 const linkHtml = getAdoLinkHtml(currentDcr.id);
+                let featureIdHtml = currentDcr.featureId ? '<br>Feature ID: <strong>' + currentDcr.featureId + '</strong>' : '';
                 document.getElementById('detailStatusText').innerHTML = '<strong>✓ Information Provided & Resubmitted</strong><br>' +
-                    'Resubmitted to ' + currentDcr.submittedProductGroup + ' - ' + currentDcr.submittedFeatureArea + ' on ' + formatDate(new Date()) + '<br>' + linkHtml;
+                    'Resubmitted to ' + currentDcr.submittedProductGroup + ' - ' + currentDcr.submittedFeatureArea + ' on ' + formatDate(new Date()) + featureIdHtml + '<br>' + linkHtml;
                 document.getElementById('submitToPGBtn').style.display = 'none';
                 document.getElementById('revertSubmissionBtn').style.display = 'inline-flex';
                 

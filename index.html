@@ -970,12 +970,60 @@
             grid-column: 1 / -1;
         }
 
+        .triage-notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .triage-note-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+        }
+
+        .triage-note-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .triage-note-type {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #0078d4;
+        }
+
+        .triage-note-text {
+            font-size: 14px;
+            color: #1f2937;
+            white-space: pre-line;
+        }
+
+        .triage-notes-empty {
+            font-size: 14px;
+            color: #6b7280;
+        }
+
         .detail-actions {
             padding: 24px;
             border-top: 1px solid #e5e7eb;
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
+        }
+
+        .table-action-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
         }
 
         .decision-picker {
@@ -1659,6 +1707,47 @@
             cursor: pointer;
         }
 
+        .reroute-current-product {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .reroute-impact-note {
+            display: none;
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            color: #9a3412;
+        }
+
+        .triage-action-summary {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #374151;
+        }
+
+        .triage-action-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .triage-action-item {
+            justify-content: flex-start;
+            width: 100%;
+        }
+
         @media (max-width: 1200px) {
             .detail-layout {
                 grid-template-columns: 1fr;
@@ -1816,7 +1905,7 @@
         }
         .column-toggle-popup label:hover { background: #f3f4f6; border-radius: 4px; }
 
-        th.sortable { cursor: pointer; user-select: none; }
+        th.sortable { cursor: pointer; -webkit-user-select: none; user-select: none; }
         th.sortable:hover { background: #eef2ff; }
         th.sortable::after { content: ' ▸'; font-size: 10px; color: #9ca3af; }
         th.sortable.sort-asc::after { content: ' ▲'; color: #0078d4; }
@@ -2882,6 +2971,12 @@
                             <h4>Description</h4>
                             <p id="detailDescription">-</p>
                         </div>
+                        <div class="detail-section full-width">
+                            <h4>Triage Notes</h4>
+                            <div id="detailTriageNotes" class="triage-notes-list">
+                                <p class="triage-notes-empty">No triage notes yet.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="detail-actions">
@@ -2900,6 +2995,15 @@
                                     <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path>
                                 </svg>
                                 Revert PG Submission
+                            </button>
+                            <button class="decision-btn" id="rerouteProductBtn" onclick="openRerouteModal(currentDcr)">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 3h4v4"></path>
+                                    <path d="M21 3l-7 7"></path>
+                                    <path d="M7 21H3v-4"></path>
+                                    <path d="M3 21l7-7"></path>
+                                </svg>
+                                Reroute Product
                             </button>
                             <button class="decision-btn" onclick="openFeatureAvailableModal()">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3390,6 +3494,100 @@
         </div>
     </div>
 
+    <!-- Reroute DCR Modal -->
+    <div class="modal-overlay" id="rerouteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Reroute DCR</h3>
+                <button class="modal-close" onclick="closeRerouteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="reroute-current-product">
+                    <strong>Current Product:</strong>
+                    <span id="rerouteCurrentProduct">-</span>
+                </div>
+                <div class="form-group">
+                    <label for="rerouteProductSelect">New Product</label>
+                    <select id="rerouteProductSelect" class="form-select">
+                        <option value="">-- Select Product --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="rerouteNotes">Triage Notes</label>
+                    <textarea id="rerouteNotes" class="form-textarea" placeholder="Explain why this DCR is being rerouted to a different product..." rows="6"></textarea>
+                </div>
+                <div class="reroute-impact-note" id="rerouteImpactNote">
+                    This DCR already has an active PG submission. Rerouting it will clear the current PG submission so it can be reviewed under the correct product.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRerouteModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="submitReroute()">Save Reroute</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Queue Triage Action Modal -->
+    <div class="modal-overlay" id="triageActionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Triage Action</h3>
+                <button class="modal-close" onclick="closeTriageActionModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="triage-action-summary">
+                    <strong id="triageActionDcrId">DCR-0000</strong>
+                    <div id="triageActionDcrMeta">Product</div>
+                </div>
+                <div class="triage-action-list">
+                    <button class="decision-btn triage-action-item" onclick="launchTriageDecision('submit')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Submit to PG
+                    </button>
+                    <button class="decision-btn triage-action-item" onclick="launchTriageDecision('reroute')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17 3h4v4"></path>
+                            <path d="M21 3l-7 7"></path>
+                            <path d="M7 21H3v-4"></path>
+                            <path d="M3 21l7-7"></path>
+                        </svg>
+                        Reroute Product
+                    </button>
+                    <button class="decision-btn triage-action-item" onclick="launchTriageDecision('available')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                        Feature Already Available
+                    </button>
+                    <button class="decision-btn triage-action-item" onclick="launchTriageDecision('rejected')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#dc2626" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="15" y1="9" x2="9" y2="15"></line>
+                            <line x1="9" y1="9" x2="15" y2="15"></line>
+                        </svg>
+                        Rejected
+                    </button>
+                    <button class="decision-btn triage-action-item" onclick="launchTriageDecision('evidence')">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#0078d4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="12" y1="18" x2="12" y2="12"></line>
+                            <line x1="9" y1="15" x2="15" y2="15"></line>
+                        </svg>
+                        CxE Evidence Gathering
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeTriageActionModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Revert Triage Modal -->
     <div class="modal-overlay" id="revertTriageModal">
         <div class="modal">
@@ -3750,18 +3948,8 @@
         function getAiRoutingSuggestion(dcr) {
             // Simulated routing recommendation based on product + feature area mapping
             var pg = 'Microsoft ' + dcr.product;
-            var areas = featureAreas[dcr.product] || [];
-            // Pick the most relevant area based on description keywords
-            var bestArea = areas[0];
-            var bestScore = 0;
-            areas.forEach(function(area) {
-                var words = area.toLowerCase().split(' ');
-                var score = 0;
-                words.forEach(function(w) {
-                    if (dcr.description.toLowerCase().includes(w) && w.length > 3) score += 1;
-                });
-                if (score > bestScore) { bestScore = score; bestArea = area; }
-            });
+            var bestArea = getBestFeatureAreaForProduct(dcr, dcr.product);
+            var bestScore = bestArea ? 1 : 0;
             var confidence = Math.min(95, 65 + bestScore * 10 + Math.floor(Math.random() * 15));
             var basisCount = Math.floor(Math.random() * 6) + 2;
             return { pg: pg, featureArea: bestArea, confidence: confidence, basisCount: basisCount };
@@ -3909,7 +4097,8 @@
                     similarCustomers: generateSimilarCustomers(),
                     matchingFeatures: [],
                     customerHealthIndex: Math.floor(Math.random() * 100) + 1,
-                    isHot: ['None', 'None', 'None', 'None', 'CRZ', 'Critical Blocker', 'TS Escalate'][Math.floor(Math.random() * 7)]
+                    isHot: ['None', 'None', 'None', 'None', 'CRZ', 'Critical Blocker', 'TS Escalate'][Math.floor(Math.random() * 7)],
+                    triageNotes: []
                 });
             }
             
@@ -3970,14 +4159,7 @@
                     showDetailView(dcr.id);
                 };
                 
-                let submitCell = '';
-                if (dcr.pgRequestMoreInfo) {
-                    submitCell = '<span class="priority p0" style="background:#fee2e2; color:#dc2626; font-weight:600; cursor:pointer;" onclick="event.stopPropagation(); showDetailView(\'' + dcr.id + '\')">⚠️ PG Needs Info</span>';
-                } else if (dcr.submittedToPG) {
-                    submitCell = '<span class="submitted-indicator"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>Submitted</span>';
-                } else {
-                    submitCell = '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openSubmitModal(\'' + dcr.id + '\')">Submit to PG</button>';
-                }
+                const actionCell = '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); openTriageActionModal(\'' + dcr.id + '\')">Triage Action</button>';
                 
                 const isHotClass = dcr.isHot === 'None' ? 'hot-none' : 'hot-critical';
                 const isHotCell = '<span class="is-hot-badge ' + isHotClass + '">' + dcr.isHot + '</span>';
@@ -3994,7 +4176,7 @@
                     '<td data-col="description"' + (vis.description ? '' : ' style="display:none"') + ' class="description-cell" title="' + dcr.description + '">' + dcr.description + '</td>' +
                     '<td><span class="priority ' + dcr.priority.toLowerCase() + '">' + dcr.priority + '</span></td>' +
                     '<td data-col="source"' + (vis.source ? '' : ' style="display:none"') + '><span class="source-badge">' + dcr.source + '</span></td>' +
-                    '<td>' + submitCell + '</td>';
+                    '<td>' + actionCell + '</td>';
                 tbody.appendChild(row);
             });
 
@@ -4132,10 +4314,12 @@
             document.getElementById('detailUseCase').textContent = dcr.useCase;
             document.getElementById('detailCustomerImpact').textContent = dcr.customerImpact;
             document.getElementById('detailDescription').textContent = dcr.description;
+            renderTriageNotes(dcr);
             
             const priorityBadge = document.getElementById('detailPriority');
             priorityBadge.textContent = dcr.priority;
             priorityBadge.className = 'priority ' + dcr.priority.toLowerCase();
+            document.getElementById('rerouteProductBtn').style.display = dcr.triageOutcome ? 'none' : 'inline-flex';
             
             const statusMessage = document.getElementById('detailStatusMessage');
             if (dcr.pgRequestMoreInfo) {
@@ -4485,6 +4669,253 @@
         let currentPgDcr = null;
         let currentAdoDcr = null;
         let adoBackView = 'cxe';
+        let rerouteDcr = null;
+
+        function formatDateTime(date) {
+            const value = new Date(date);
+            return value.toLocaleString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        }
+
+        function ensureTriageNotes(dcr) {
+            if (!dcr.triageNotes) {
+                dcr.triageNotes = [];
+            }
+            return dcr.triageNotes;
+        }
+
+        function addTriageNote(dcr, type, text) {
+            ensureTriageNotes(dcr).unshift({
+                type: type,
+                text: text,
+                createdAt: new Date()
+            });
+        }
+
+        function renderTriageNotes(dcr) {
+            const container = document.getElementById('detailTriageNotes');
+            if (!container || !dcr) return;
+
+            const notes = ensureTriageNotes(dcr);
+            container.innerHTML = '';
+
+            if (!notes.length) {
+                const empty = document.createElement('p');
+                empty.className = 'triage-notes-empty';
+                empty.textContent = 'No triage notes yet.';
+                container.appendChild(empty);
+                return;
+            }
+
+            notes.forEach(function(note) {
+                const item = document.createElement('div');
+                item.className = 'triage-note-item';
+
+                const meta = document.createElement('div');
+                meta.className = 'triage-note-meta';
+
+                const type = document.createElement('span');
+                type.className = 'triage-note-type';
+                type.textContent = note.type;
+
+                const timestamp = document.createElement('span');
+                timestamp.textContent = formatDateTime(note.createdAt);
+
+                meta.appendChild(type);
+                meta.appendChild(timestamp);
+
+                const text = document.createElement('div');
+                text.className = 'triage-note-text';
+                text.textContent = note.text;
+
+                item.appendChild(meta);
+                item.appendChild(text);
+                container.appendChild(item);
+            });
+        }
+
+        function getBestFeatureAreaForProduct(dcr, product) {
+            const areas = featureAreas[product] || [];
+            if (!areas.length) return '';
+
+            const sourceText = [dcr.title, dcr.description, dcr.useCase, dcr.customerImpact].join(' ').toLowerCase();
+            let bestArea = areas[0];
+            let bestScore = -1;
+
+            areas.forEach(function(area) {
+                let score = 0;
+                area.toLowerCase().split(/\s+/).forEach(function(word) {
+                    if (word.length > 3 && sourceText.indexOf(word) !== -1) {
+                        score += 2;
+                    }
+                });
+
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestArea = area;
+                }
+            });
+
+            return bestArea;
+        }
+
+        function clearPgSubmissionState(dcr) {
+            dcr.submittedToPG = false;
+            dcr.submittedProductGroup = null;
+            dcr.submittedFeatureArea = null;
+            dcr.submittedDate = null;
+            dcr.adoId = null;
+            dcr.adoStatus = null;
+            dcr.featureId = null;
+            dcr.pgTriageOutcome = null;
+            dcr.pgRequestMoreInfo = false;
+            dcr.pgInfoRequested = null;
+            dcr.pgResponseInfo = null;
+            dcr.pgTriageDate = null;
+            dcr.pgFeatureStatus = null;
+            dcr.pgApprovalLink = null;
+            dcr.pgApprovalNotes = null;
+            dcr.pgRejectionReason = null;
+            dcr.pgRejectionNotes = null;
+            dcr.pgBacklogLink = null;
+            dcr.pgBacklogNotes = null;
+        }
+
+        function openRerouteModal(dcrOrId) {
+            if (typeof dcrOrId === 'string') {
+                rerouteDcr = dcrData.find(function(d) { return d.id === dcrOrId; });
+            } else {
+                rerouteDcr = dcrOrId;
+            }
+
+            if (!rerouteDcr) return;
+
+            const select = document.getElementById('rerouteProductSelect');
+            select.innerHTML = '<option value="">-- Select Product --</option>';
+
+            products.forEach(function(product) {
+                const option = document.createElement('option');
+                option.value = product;
+                option.textContent = product;
+                select.appendChild(option);
+            });
+
+            document.getElementById('rerouteCurrentProduct').textContent = rerouteDcr.product;
+            document.getElementById('rerouteNotes').value = '';
+            document.getElementById('rerouteImpactNote').style.display = (rerouteDcr.submittedToPG || rerouteDcr.pgRequestMoreInfo) ? 'block' : 'none';
+            document.getElementById('rerouteModal').classList.add('active');
+        }
+
+        function closeRerouteModal() {
+            document.getElementById('rerouteModal').classList.remove('active');
+            rerouteDcr = null;
+        }
+
+        function openTriageActionModal(dcrId) {
+            const dcr = dcrData.find(function(item) { return item.id === dcrId; });
+            if (!dcr) return;
+
+            currentDcr = dcr;
+            document.getElementById('triageActionDcrId').textContent = dcr.id;
+            document.getElementById('triageActionDcrMeta').textContent = dcr.product + ' • ' + dcr.customer;
+            document.getElementById('triageActionModal').classList.add('active');
+        }
+
+        function closeTriageActionModal() {
+            document.getElementById('triageActionModal').classList.remove('active');
+        }
+
+        function launchTriageDecision(action) {
+            if (!currentDcr) return;
+
+            const dcr = currentDcr;
+            closeTriageActionModal();
+
+            if (action === 'submit') {
+                openSubmitModal(dcr.id);
+                return;
+            }
+
+            if (action === 'reroute') {
+                openRerouteModal(dcr.id);
+                return;
+            }
+
+            if (action === 'available') {
+                openFeatureAvailableModal();
+                return;
+            }
+
+            if (action === 'rejected') {
+                openRejectedModal();
+                return;
+            }
+
+            if (action === 'evidence') {
+                openEvidenceGatheringModal();
+            }
+        }
+
+        function submitReroute() {
+            const newProduct = document.getElementById('rerouteProductSelect').value;
+            const notes = document.getElementById('rerouteNotes').value.trim();
+
+            if (!rerouteDcr) return;
+
+            if (!newProduct) {
+                showToast('Please select the product to reroute this DCR to.', 'warning');
+                return;
+            }
+
+            if (newProduct === rerouteDcr.product) {
+                showToast('Please choose a different product for the reroute.', 'warning');
+                return;
+            }
+
+            if (!notes) {
+                showToast('Please add triage notes explaining the reroute.', 'warning');
+                return;
+            }
+
+            const activeDcr = rerouteDcr;
+            const hadPgSubmission = activeDcr.submittedToPG || activeDcr.pgRequestMoreInfo;
+            const previousProduct = activeDcr.product;
+            const previousArea = activeDcr.productArea;
+
+            activeDcr.product = newProduct;
+            activeDcr.productArea = getBestFeatureAreaForProduct(activeDcr, newProduct);
+            activeDcr.matchingFeatures = getMatchingFeaturesForProduct(newProduct, activeDcr.duplicationScore);
+            activeDcr.mappedFeature = null;
+            activeDcr.linkedFeatureRequest = null;
+
+            if (hadPgSubmission) {
+                clearPgSubmissionState(activeDcr);
+            }
+
+            addTriageNote(
+                activeDcr,
+                'Reroute',
+                'Product changed from ' + previousProduct + ' to ' + newProduct + '.' +
+                '\nPrevious product area: ' + previousArea +
+                '\nNew product area: ' + activeDcr.productArea +
+                '\nReason: ' + notes +
+                (hadPgSubmission ? '\nExisting PG submission was cleared so the DCR can be routed under the new product.' : '')
+            );
+
+            closeRerouteModal();
+            refreshAllViews();
+
+            if (currentDcr && currentDcr.id === activeDcr.id) {
+                showDetailView(activeDcr.id);
+            }
+
+            showToast('DCR ' + activeDcr.id + ' rerouted to ' + newProduct + '.', 'success');
+        }
 
         // Feature Already Available Modal functions
         let availableSelectedFeature = null;
